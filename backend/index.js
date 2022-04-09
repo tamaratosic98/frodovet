@@ -28,11 +28,12 @@ app.get('/veterinar', (req, res) => {
         })
         .catch((err) => {
             console.log(err);
+            res.status(400).json({ msg: 'Greska.', error: err });
         });
 });
 
 // GET VETERINAR BY ID
-app.get('/veterinar/:id', (req, res) => {
+app.get('/veterinari/:id', (req, res) => {
     const id = req.params.id;
     db.select('*')
         .from('Veterinar')
@@ -42,11 +43,12 @@ app.get('/veterinar/:id', (req, res) => {
         })
         .catch((err) => {
             console.log(err);
+            res.status(400).json({ msg: 'Greska.', error: err });
         });
 });
 
 //DELETE VETERINAR BY ID 
-app.delete('/delete-veterinar/:id', (req, res) => {
+app.delete('/veterinari/:id', (req, res) => {
     const id = req.params.id;
     db('Veterinar')
         .where('jmbg', '=', id)
@@ -57,11 +59,12 @@ app.delete('/delete-veterinar/:id', (req, res) => {
         })
         .catch((err) => {
             console.log(err);
+            res.status(400).json({ msg: 'Greska u brisanju veterinara.', error: err });
         });
 });
 
 //UPDATE FAKTURA
-app.put('/update-veterinar/:id', (req, res) => {
+app.put('/veterinari/:id', (req, res) => {
     const id = req.params.id;
     const {
         ime,
@@ -88,12 +91,14 @@ app.put('/update-veterinar/:id', (req, res) => {
         })
         .catch((err) => {
             console.log(err);
+            res.status(400).json({ msg: 'Greska u azuriranju veterinara.', error: err });
         });
 });
 
 //CREATE VETERINAR
-app.post('/create-veterinar', (req, res) => {
+app.post('/veterinari', (req, res) => {
     const {
+        jmbg,
         ime,
         datumRodjenja,
         prezime,
@@ -101,8 +106,10 @@ app.post('/create-veterinar', (req, res) => {
         telefon,
         grad
     } = req.body;
+
     db('Veterinar')
         .insert({
+            jmbg: jmbg,
             ime: ime,
             adresa: adresa,
             datumRodjenja: datumRodjenja,
@@ -111,11 +118,14 @@ app.post('/create-veterinar', (req, res) => {
             grad: grad
         })
         .then(() => {
+
             return res.json({ msg: 'Veterinar Kreiran' });
         })
         .catch((err) => {
             console.log(err);
-        });
+            console.log('Status code:' + res.statusCode);
+            res.status(400).json({ msg: 'Greska u kreiranju veterinara.', error: err });
+        })
 });
 
 
