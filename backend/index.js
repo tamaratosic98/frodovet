@@ -18,9 +18,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 
-// VETERINARI
+// TABLE VETERINAR
 // GET ALL VETERINARI
-app.get('/veterinar', (req, res) => {
+app.get('/veterinari', (req, res) => {
     db.select('*')
         .from('Veterinar')
         .then((data) => {
@@ -63,7 +63,7 @@ app.delete('/veterinari/:id', (req, res) => {
         });
 });
 
-//UPDATE FAKTURA
+//UPDATE VETERINAR
 app.put('/veterinari/:id', (req, res) => {
     const id = req.params.id;
     const {
@@ -129,7 +129,184 @@ app.post('/veterinari', (req, res) => {
 });
 
 
+// TABLE RASA
+// GET ALL RASE
+app.get('/rase', (req, res) => {
+    db.select('*')
+        .from('Rasa')
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).json({ msg: 'Greska.', error: err });
+        });
+});
 
+// GET RASA BY ID
+app.get('/rase/:id', (req, res) => {
+    const id = req.params.id;
+    db.select('*')
+        .from('Rasa')
+        .where('sifra', '=', id)
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).json({ msg: 'Greska.', error: err });
+        });
+});
+
+//DELETE RASA BY ID 
+app.delete('/rase/:id', (req, res) => {
+    const id = req.params.id;
+    db('Rasa')
+        .where('sifra', '=', id)
+        .del()
+        .then(() => {
+            console.log('Rasa Obrisana');
+            return res.json({ msg: 'Rasa Obrisana' });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).json({ msg: 'Greska u brisanju rase.', error: err });
+        });
+});
+
+//UPDATE RASA
+app.put('/rase/:id', (req, res) => {
+    const id = req.params.id;
+    const {
+        naziv
+    } = req.body;
+
+    db('Rasa')
+        .where('sifra', '=', id)
+        .update(
+            {
+                naziv: naziv
+            }
+        ).then(() => {
+            return res.json({ msg: 'Rasa Azurirana' });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).json({ msg: 'Greska u azuriranju rase.', error: err });
+        });
+});
+
+//CREATE RASA
+app.post('/rase', (req, res) => {
+    const {
+        sifra,
+        naziv
+    } = req.body;
+
+    db('Rasa')
+        .insert({
+            sifra: sifra,
+            naziv: naziv
+        })
+        .then(() => {
+            return res.json({ msg: 'Rasa Kreirana' });
+        })
+        .catch((err) => {
+            console.log(err);
+            console.log('Status code:' + res.statusCode);
+            res.status(400).json({ msg: 'Greska u kreiranju rase.', error: err });
+        })
+});
+
+
+// TABLE LOKACIJA
+// GET ALL LOKACIJE
+app.get('/lokacije', (req, res) => {
+    db.select('*')
+        .from('Lokacija')
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).json({ msg: 'Greska.', error: err });
+        });
+});
+
+// GET LOKACIJA BY ID
+app.get('/lokacije/:id', (req, res) => {
+    const id = req.params.id;
+    db.select('*')
+        .from('Lokacija')
+        .where('sifra', '=', id)
+        .then((data) => {
+            res.json(data);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).json({ msg: 'Greska.', error: err });
+        });
+});
+
+//DELETE LOKACIJA BY ID 
+app.delete('/lokacije/:id', (req, res) => {
+    const id = req.params.id;
+    db('Lokacija')
+        .where('sifra', '=', id)
+        .del()
+        .then(() => {
+            console.log('Lokacija Obrisana');
+            return res.json({ msg: 'Lokacija Obrisana' });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).json({ msg: 'Greska u brisanju lokacije.', error: err });
+        });
+});
+
+//UPDATE LOKACIJA
+app.put('/lokacije/:id', (req, res) => {
+    const id = req.params.id;
+    const {
+        naziv
+    } = req.body;
+
+    db('Lokacija')
+        .where('sifra', '=', id)
+        .update(
+            {
+                naziv: naziv
+            }
+        ).then(() => {
+            return res.json({ msg: 'Lokacija Azurirana' });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).json({ msg: 'Greska u azuriranju lokacije.', error: err });
+        });
+});
+
+//CREATE LOKACIJA
+app.post('/lokacije', (req, res) => {
+    const {
+        sifra,
+        naziv
+    } = req.body;
+
+    db('Lokacija')
+        .insert({
+            sifra: sifra,
+            naziv: naziv
+        })
+        .then(() => {
+            return res.json({ msg: 'Lokacija Kreirana' });
+        })
+        .catch((err) => {
+            console.log(err);
+            console.log('Status code:' + res.statusCode);
+            res.status(400).json({ msg: 'Greska u kreiranju lokacije.', error: err });
+        })
+});
 
 
 const port = 5000;
