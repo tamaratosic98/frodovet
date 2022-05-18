@@ -5,10 +5,10 @@ import { ApiRoutesConstants } from "../../utils/contants";
 
 interface IVeterinarService {
     all: () => Promise<TResponse<TVeterinar[]>>;
-    byId?: (id: number) => Promise<TResponse<TVeterinar>>,
-    create?: (item: TVeterinar) => Promise<TResponse<TVeterinar>>;
-    update?: (id: number, item: TVeterinar) => Promise<TResponse<TVeterinar>>;
-    delete?: (id: number) => Promise<TResponse<TVeterinar>>;
+    byId: (id: string) => Promise<TResponse<TVeterinar>>,
+    create: (item: TVeterinar) => Promise<TResponse<TVeterinar>>;
+    update: (id: string, item: TVeterinar) => Promise<TResponse<TVeterinar>>;
+    delete: (id: string) => Promise<TResponse<TVeterinar>>;
 }
 
 export const VeterinarService: IVeterinarService = {
@@ -20,7 +20,7 @@ export const VeterinarService: IVeterinarService = {
             status: result.status
         };
     },
-    byId: async (id: number): Promise<TResponse<any>> => {
+    byId: async (id: string): Promise<TResponse<any>> => {
         const result = await AxiosFV.get(`/${ApiRoutesConstants.VETERINAR}/${id}`);
 
         return {
@@ -36,7 +36,7 @@ export const VeterinarService: IVeterinarService = {
             status: result.status
         };
     },
-    update: async (id: number, item: TVeterinar): Promise<TResponse<TVeterinar>> => {
+    update: async (id: string, item: TVeterinar): Promise<TResponse<TVeterinar>> => {
         const result = await AxiosFV.put(`/${ApiRoutesConstants.VETERINAR}/${id}`, item);
 
         return {
@@ -44,7 +44,7 @@ export const VeterinarService: IVeterinarService = {
             status: result.status
         };
     },
-    delete: async (id: number): Promise<TResponse<TVeterinar>> => {
+    delete: async (id: string): Promise<TResponse<TVeterinar>> => {
         const result = await AxiosFV.delete(`/${ApiRoutesConstants.VETERINAR}/${id}`);
 
         return {

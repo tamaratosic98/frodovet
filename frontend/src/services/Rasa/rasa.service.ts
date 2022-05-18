@@ -5,10 +5,10 @@ import { ApiRoutesConstants } from "../../utils/contants";
 
 interface IRasaService {
     all: () => Promise<TResponse<TRasa[]>>;
-    byId?: (id: number) => Promise<TResponse<TRasa>>,
-    create?: (item: TRasa) => Promise<TResponse<TRasa>>;
-    update?: (id: number, item: TRasa) => Promise<TResponse<TRasa>>;
-    delete?: (id: number) => Promise<TResponse<TRasa>>;
+    byId: (id: number) => Promise<TResponse<TRasa>>,
+    create: (item: TRasa) => Promise<TResponse<TRasa>>;
+    update: (id: number, item: TRasa) => Promise<TResponse<TRasa>>;
+    delete: (id: number) => Promise<TResponse<TRasa>>;
 }
 
 export const RasaService: IRasaService = {

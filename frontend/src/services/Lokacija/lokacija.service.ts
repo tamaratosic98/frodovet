@@ -5,10 +5,10 @@ import { ApiRoutesConstants } from "../../utils/contants";
 
 interface ILokacijaService {
     all: () => Promise<TResponse<TLokacija[]>>;
-    byId?: (id: number) => Promise<TResponse<TLokacija>>,
-    create?: (item: TLokacija) => Promise<TResponse<TLokacija>>;
-    update?: (id: number, item: TLokacija) => Promise<TResponse<TLokacija>>;
-    delete?: (id: number) => Promise<TResponse<TLokacija>>;
+    byId: (id: number) => Promise<TResponse<TLokacija>>,
+    create: (item: TLokacija) => Promise<TResponse<TLokacija>>;
+    update: (id: number, item: TLokacija) => Promise<TResponse<TLokacija>>;
+    delete: (id: number) => Promise<TResponse<TLokacija>>;
 }
 
 export const LokacijaService: ILokacijaService = {

@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { TKorisnik } from "../../interfaces/models/Korisnik/korisnik.model";
-import { KorisnikService } from "../../services/Korisnik/korisnik.service";
+import { TTermin } from "../../interfaces/models/Termin/termin.model";
+import { TerminService } from "../../services/Termin/termin.service";
 
-export const useKorisnici = () => {
-    const [items, setItems] = useState<TKorisnik[]>([]);
+export const useTermini = () => {
+    const [items, setItems] = useState<TTermin[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>();
 
     const loadItems = useCallback(async () => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.all();
+            const result = await TerminService.all();
 
             setItems(result.data);
         } catch (err) {
@@ -30,14 +30,14 @@ export const useKorisnici = () => {
     }), [items, isLoading, loadItems]);
 };
 
-export const useKorisnk = (id: number) => {
-    const [item, setItem] = useState<TKorisnik>({});
+export const useZivotinja = (idZivotinje: number, idVeterinara: string, datum: Date) => {
+    const [item, setItem] = useState<TTermin>({});
     const [isLoading, setIsLoading] = useState<boolean>();
 
     const loadItem = useCallback(async () => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.byId(id);
+            const result = await TerminService.byId(idVeterinara, idZivotinje, datum);
 
             setItem(result.data);
         } catch (err) {
@@ -49,7 +49,7 @@ export const useKorisnk = (id: number) => {
 
     useEffect(() => {
         loadItem();
-    }, [id]);
+    }, [idZivotinje, idVeterinara, datum]);
 
     return useMemo(() => ({
         item,
@@ -58,14 +58,14 @@ export const useKorisnk = (id: number) => {
     }), [item, isLoading, loadItem]);
 };
 
-export const useCudKorisnk = () => {
-    const [item, setItem] = useState<TKorisnik>({});
+export const useCudZivotinja = () => {
+    const [item, setItem] = useState<TTermin>({});
     const [isLoading, setIsLoading] = useState<boolean>();
 
-    const createItem = useCallback(async (item: TKorisnik) => {
+    const createItem = useCallback(async (item: TTermin) => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.create(item);
+            const result = await TerminService.create(item);
 
             setItem(result.data);
         } catch (err) {
@@ -75,10 +75,10 @@ export const useCudKorisnk = () => {
         setIsLoading(false);
     }, []);
 
-    const deleteItem = useCallback(async (id: number) => {
+    const deleteItem = useCallback(async (idZivotinje: number, idVeterinara: string, datum: Date) => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.delete(id);
+            const result = await TerminService.delete(idVeterinara, idZivotinje, datum);
 
             setItem(result.data);
         } catch (err) {
@@ -88,10 +88,10 @@ export const useCudKorisnk = () => {
         setIsLoading(false);
     }, []);
 
-    const updateItem = useCallback(async (id: number, item: TKorisnik) => {
+    const updateItem = useCallback(async (idZivotinje: number, idVeterinara: string, datum: Date, item: TTermin) => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.update(id, item);
+            const result = await TerminService.update(idVeterinara, idZivotinje, datum, item);
 
             setItem(result.data);
         } catch (err) {

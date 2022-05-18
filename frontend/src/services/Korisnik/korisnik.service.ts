@@ -5,10 +5,10 @@ import { ApiRoutesConstants } from "../../utils/contants";
 
 interface IKorisnikService {
     all: () => Promise<TResponse<TKorisnik[]>>;
-    byId?: (id: number) => Promise<TResponse<TKorisnik>>,
-    create?: (item: TKorisnik) => Promise<TResponse<TKorisnik>>;
-    update?: (id: number, item: TKorisnik) => Promise<TResponse<TKorisnik>>;
-    delete?: (id: number) => Promise<TResponse<TKorisnik>>;
+    byId: (id: number) => Promise<TResponse<TKorisnik>>,
+    create: (item: TKorisnik) => Promise<TResponse<TKorisnik>>;
+    update: (id: number, item: TKorisnik) => Promise<TResponse<TKorisnik>>;
+    delete: (id: number) => Promise<TResponse<TKorisnik>>;
 }
 
 export const KorisnikService: IKorisnikService = {

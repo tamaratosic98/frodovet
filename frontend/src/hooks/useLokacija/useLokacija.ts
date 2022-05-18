@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { TKorisnik } from "../../interfaces/models/Korisnik/korisnik.model";
-import { KorisnikService } from "../../services/Korisnik/korisnik.service";
+import { TLokacija } from "../../interfaces/models/Lokacija/lokacija.model";
+import { LokacijaService } from "../../services/Lokacija/lokacija.service";
 
-export const useKorisnici = () => {
-    const [items, setItems] = useState<TKorisnik[]>([]);
+export const useLokacije = () => {
+    const [items, setItems] = useState<TLokacija[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>();
 
     const loadItems = useCallback(async () => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.all();
+            const result = await LokacijaService.all();
 
             setItems(result.data);
         } catch (err) {
@@ -30,14 +30,14 @@ export const useKorisnici = () => {
     }), [items, isLoading, loadItems]);
 };
 
-export const useKorisnk = (id: number) => {
-    const [item, setItem] = useState<TKorisnik>({});
+export const useLokacija = (id: number) => {
+    const [item, setItem] = useState<TLokacija>({});
     const [isLoading, setIsLoading] = useState<boolean>();
 
     const loadItem = useCallback(async () => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.byId(id);
+            const result = await LokacijaService.byId(id);
 
             setItem(result.data);
         } catch (err) {
@@ -58,14 +58,14 @@ export const useKorisnk = (id: number) => {
     }), [item, isLoading, loadItem]);
 };
 
-export const useCudKorisnk = () => {
-    const [item, setItem] = useState<TKorisnik>({});
+export const useCudLokacija = () => {
+    const [item, setItem] = useState<TLokacija>({});
     const [isLoading, setIsLoading] = useState<boolean>();
 
-    const createItem = useCallback(async (item: TKorisnik) => {
+    const createItem = useCallback(async (item: TLokacija) => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.create(item);
+            const result = await LokacijaService.create(item);
 
             setItem(result.data);
         } catch (err) {
@@ -78,7 +78,7 @@ export const useCudKorisnk = () => {
     const deleteItem = useCallback(async (id: number) => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.delete(id);
+            const result = await LokacijaService.delete(id);
 
             setItem(result.data);
         } catch (err) {
@@ -88,10 +88,10 @@ export const useCudKorisnk = () => {
         setIsLoading(false);
     }, []);
 
-    const updateItem = useCallback(async (id: number, item: TKorisnik) => {
+    const updateItem = useCallback(async (id: number, item: TLokacija) => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.update(id, item);
+            const result = await LokacijaService.update(id, item);
 
             setItem(result.data);
         } catch (err) {

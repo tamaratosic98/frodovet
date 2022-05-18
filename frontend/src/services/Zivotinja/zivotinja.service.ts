@@ -5,10 +5,10 @@ import { ApiRoutesConstants } from "../../utils/contants";
 
 interface IZivotinjaService {
     all: () => Promise<TResponse<TVeterinar[]>>;
-    byId?: (id: number) => Promise<TResponse<TVeterinar>>,
-    create?: (item: TVeterinar) => Promise<TResponse<TVeterinar>>;
-    update?: (id: number, item: TVeterinar) => Promise<TResponse<TVeterinar>>;
-    delete?: (id: number) => Promise<TResponse<TVeterinar>>;
+    byId: (id: number) => Promise<TResponse<TVeterinar>>,
+    create: (item: TVeterinar) => Promise<TResponse<TVeterinar>>;
+    update: (id: number, item: TVeterinar) => Promise<TResponse<TVeterinar>>;
+    delete: (id: number) => Promise<TResponse<TVeterinar>>;
 }
 
 export const ZivotinjaService: IZivotinjaService = {

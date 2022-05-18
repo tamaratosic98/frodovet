@@ -5,10 +5,10 @@ import { ApiRoutesConstants } from "../../utils/contants";
 
 interface ITerminService {
     all: () => Promise<TResponse<TTermin[]>>;
-    byId?: (idVeterinara: string, idZivotinje: number, datum: Date) => Promise<TResponse<TTermin>>,
-    create?: (item: TTermin) => Promise<TResponse<TTermin>>;
-    update?: (idVeterinara: string, idZivotinje: number, datum: Date, item: TTermin) => Promise<TResponse<TTermin>>;
-    delete?: (idVeterinara: string, idZivotinje: number, datum: Date) => Promise<TResponse<TTermin>>;
+    byId: (idVeterinara: string, idZivotinje: number, datum: Date) => Promise<TResponse<TTermin>>,
+    create: (item: TTermin) => Promise<TResponse<TTermin>>;
+    update: (idVeterinara: string, idZivotinje: number, datum: Date, item: TTermin) => Promise<TResponse<TTermin>>;
+    delete: (idVeterinara: string, idZivotinje: number, datum: Date) => Promise<TResponse<TTermin>>;
 }
 
 export const TerminService: ITerminService = {

@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { TKorisnik } from "../../interfaces/models/Korisnik/korisnik.model";
-import { KorisnikService } from "../../services/Korisnik/korisnik.service";
+import { TVeterinar } from "../../interfaces/models/Veterinar/veterinar.model";
+import { VeterinarService } from "../../services/Veterinar/veterinar.service";
 
-export const useKorisnici = () => {
-    const [items, setItems] = useState<TKorisnik[]>([]);
+export const useVeterinari = () => {
+    const [items, setItems] = useState<TVeterinar[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>();
 
     const loadItems = useCallback(async () => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.all();
+            const result = await VeterinarService.all();
 
             setItems(result.data);
         } catch (err) {
@@ -30,14 +30,14 @@ export const useKorisnici = () => {
     }), [items, isLoading, loadItems]);
 };
 
-export const useKorisnk = (id: number) => {
-    const [item, setItem] = useState<TKorisnik>({});
+export const useVeterinar = (id: string) => {
+    const [item, setItem] = useState<TVeterinar>({});
     const [isLoading, setIsLoading] = useState<boolean>();
 
     const loadItem = useCallback(async () => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.byId(id);
+            const result = await VeterinarService.byId(id);
 
             setItem(result.data);
         } catch (err) {
@@ -58,14 +58,14 @@ export const useKorisnk = (id: number) => {
     }), [item, isLoading, loadItem]);
 };
 
-export const useCudKorisnk = () => {
-    const [item, setItem] = useState<TKorisnik>({});
+export const useCudVeterinar = () => {
+    const [item, setItem] = useState<TVeterinar>({});
     const [isLoading, setIsLoading] = useState<boolean>();
 
-    const createItem = useCallback(async (item: TKorisnik) => {
+    const createItem = useCallback(async (item: TVeterinar) => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.create(item);
+            const result = await VeterinarService.create(item);
 
             setItem(result.data);
         } catch (err) {
@@ -75,10 +75,10 @@ export const useCudKorisnk = () => {
         setIsLoading(false);
     }, []);
 
-    const deleteItem = useCallback(async (id: number) => {
+    const deleteItem = useCallback(async (id: string) => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.delete(id);
+            const result = await VeterinarService.delete(id);
 
             setItem(result.data);
         } catch (err) {
@@ -88,10 +88,10 @@ export const useCudKorisnk = () => {
         setIsLoading(false);
     }, []);
 
-    const updateItem = useCallback(async (id: number, item: TKorisnik) => {
+    const updateItem = useCallback(async (id: string, item: TVeterinar) => {
         setIsLoading(true);
         try {
-            const result = await KorisnikService.update(id, item);
+            const result = await VeterinarService.update(id, item);
 
             setItem(result.data);
         } catch (err) {
