@@ -1,6 +1,8 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const knex = require('knex');
+const mysql = require('mysql');
 require('dotenv').config();
 const db = knex({
     client: 'mysql',
@@ -96,36 +98,34 @@ app.put('/veterinari/:id', (req, res) => {
 });
 
 //CREATE VETERINAR
-app.post('/veterinari', (req, res) => {
-    const {
-        jmbg,
-        ime,
-        datumRodjenja,
-        prezime,
-        adresa,
-        telefon,
-        grad
-    } = req.body;
+app.post('/veterinari', verifyToken, (req, res) => {
+    jwt.verify(req.token, 'authToken', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else {
+            const { jmbg, ime, datumRodjenja, prezime, adresa, telefon, grad } = req.body;
 
-    db('Veterinar')
-        .insert({
-            jmbg: jmbg,
-            ime: ime,
-            adresa: adresa,
-            datumRodjenja: datumRodjenja,
-            prezime: prezime,
-            telefon: telefon,
-            grad: grad
-        })
-        .then(() => {
+            db('Veterinar')
+                .insert({
+                    jmbg: jmbg,
+                    ime: ime,
+                    adresa: adresa,
+                    datumRodjenja: datumRodjenja,
+                    prezime: prezime,
+                    telefon: telefon,
+                    grad: grad
+                })
+                .then(() => {
+                    return res.json({ msg: 'Veterinar Kreiran', authData: authData });
+                })
+                .catch((err) => {
+                    console.log(err);
+                    console.log('Status code:' + res.statusCode);
+                    res.status(400).json({ msg: 'Greska u kreiranju veterinara.', error: err });
+                })
+        }
+    });
 
-            return res.json({ msg: 'Veterinar Kreiran' });
-        })
-        .catch((err) => {
-            console.log(err);
-            console.log('Status code:' + res.statusCode);
-            res.status(400).json({ msg: 'Greska u kreiranju veterinara.', error: err });
-        })
 });
 //#endregion
 
@@ -647,5 +647,64 @@ app.post('/korisnici', (req, res) => {
 });
 //#endregion
 
+const connection = mysql.createConnection({
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE
+});
+
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    if (!!username && !!password) {
+        connection.query('SELECT * FROM Korisnik WHERE username = ? AND password = ?', [username, password], function (error, results, fields) {
+            if (error) {
+                throw error
+            }
+
+            if (results.length > 0) {
+                const user = {
+                    username: username,
+                    password: password
+                };
+                jwt.sign({ user }, 'authToken', (err, token) => {
+                    res.json({
+                        token
+                    });
+                });
+
+            } else {
+                res.send('Pogresno korisnicko ime ili lozinka!');
+            }
+        });
+    }
+});
+
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Welcome to the API'
+    });
+});
+
+//#region FUNCTIONS
+
+function verifyToken(req, res, next) {
+    const bearerHeader = req.headers['authorization'];
+    if (typeof bearerHeader !== 'undefined') {
+        const bearer = bearerHeader.split(' ')[1];
+        req.token = bearer;
+        next();
+    } else {
+        res.sendStatus(403);
+        // res.json({
+        //     message: 'Nemate dozvolu da izvrsite ovaj zahtev.'
+        // })
+    };
+}
+
+//#endregion
+
 const port = 5000;
 app.listen(port, () => console.log(`Server je pokrenut na portu ${port}, http://localhost:${port}`));
+
