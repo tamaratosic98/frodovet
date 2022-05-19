@@ -64,7 +64,7 @@ app.delete('/veterinari/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
+        } else if (authData.user.role == 'admin') {
             const id = req.params.id;
             db('Veterinar')
                 .where('jmbg', '=', id)
@@ -77,6 +77,11 @@ app.delete('/veterinari/:id', verifyToken, (req, res) => {
                     console.log(err);
                     res.status(400).json({ msg: 'Greska u brisanju veterinara.', error: err });
                 });
+        } else {
+            res.sendStatus(403);
+            // res.json({
+            //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            // });
         }
     });
 });
@@ -86,7 +91,7 @@ app.put('/veterinari/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
+        } else if (authData.user.role == 'admin') {
             const id = req.params.id;
             const {
                 ime,
@@ -115,6 +120,11 @@ app.put('/veterinari/:id', verifyToken, (req, res) => {
                     console.log(err);
                     res.status(400).json({ msg: 'Greska u azuriranju veterinara.', error: err });
                 });
+        } else {
+            res.sendStatus(403);
+            // res.json({
+            //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            // });
         }
     });
 });
@@ -124,7 +134,7 @@ app.post('/veterinari', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
+        } else if (authData.user.role == 'admin') {
             const { jmbg, ime, datumRodjenja, prezime, adresa, telefon, grad } = req.body;
 
             db('Veterinar')
@@ -145,6 +155,11 @@ app.post('/veterinari', verifyToken, (req, res) => {
                     console.log('Status code:' + res.statusCode);
                     res.status(400).json({ msg: 'Greska u kreiranju veterinara.', error: err });
                 })
+        } else {
+            res.sendStatus(403);
+            // res.json({
+            //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            // });
         }
     });
 
@@ -185,7 +200,7 @@ app.delete('/rase/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
+        } else if (authData.user.role == 'admin') {
             const id = req.params.id;
             db('Rasa')
                 .where('sifra', '=', id)
@@ -198,6 +213,11 @@ app.delete('/rase/:id', verifyToken, (req, res) => {
                     console.log(err);
                     res.status(400).json({ msg: 'Greska u brisanju rase.', error: err });
                 });
+        } else {
+            res.sendStatus(403);
+            res.json({
+                message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            });
         }
     });
 });
@@ -207,7 +227,7 @@ app.put('/rase/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
+        } else if (authData.user.role === 'admin') {
             const id = req.params.id;
             const {
                 naziv
@@ -226,6 +246,11 @@ app.put('/rase/:id', verifyToken, (req, res) => {
                     console.log(err);
                     res.status(400).json({ msg: 'Greska u azuriranju rase.', error: err });
                 });
+        } else {
+            res.sendStatus(403);
+            res.json({
+                message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            });
         }
     });
 });
@@ -235,7 +260,7 @@ app.post('/rase', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
+        } else if (authData.user.role === 'admin') {
             const {
                 sifra,
                 naziv
@@ -254,6 +279,11 @@ app.post('/rase', verifyToken, (req, res) => {
                     console.log('Status code:' + res.statusCode);
                     res.status(400).json({ msg: 'Greska u kreiranju rase.', error: err });
                 })
+        } else {
+            res.sendStatus(403);
+            res.json({
+                message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            });
         }
     });
 });
@@ -293,7 +323,7 @@ app.delete('/lokacije/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
+        } else if (authData.user.role === 'admin') {
             const id = req.params.id;
             db('Lokacija')
                 .where('sifra', '=', id)
@@ -306,6 +336,11 @@ app.delete('/lokacije/:id', verifyToken, (req, res) => {
                     console.log(err);
                     res.status(400).json({ msg: 'Greska u brisanju lokacije.', error: err });
                 });
+        } else {
+            res.sendStatus(403);
+            res.json({
+                message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            });
         }
     });
 
@@ -316,7 +351,7 @@ app.put('/lokacije/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
+        } else if (authData.user.role === 'admin') {
             const id = req.params.id;
             const {
                 naziv
@@ -335,6 +370,11 @@ app.put('/lokacije/:id', verifyToken, (req, res) => {
                     console.log(err);
                     res.status(400).json({ msg: 'Greska u azuriranju lokacije.', error: err });
                 });
+        } else {
+            res.sendStatus(403);
+            res.json({
+                message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            });
         }
     });
 });
@@ -344,7 +384,7 @@ app.post('/lokacije', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
+        } else if (authData.user.role === 'admin') {
             const {
                 sifra,
                 naziv
@@ -363,6 +403,11 @@ app.post('/lokacije', verifyToken, (req, res) => {
                     console.log('Status code:' + res.statusCode);
                     res.status(400).json({ msg: 'Greska u kreiranju lokacije.', error: err });
                 })
+        } else {
+            res.sendStatus(403);
+            res.json({
+                message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            });
         }
     });
 
@@ -371,31 +416,53 @@ app.post('/lokacije', verifyToken, (req, res) => {
 
 //#region TABLE ZIVOTINJA
 // GET ALL ZIVOTINJE
-app.get('/zivotinje', (req, res) => {
-    db.select('*')
-        .from('Zivotinja')
-        .then((data) => {
-            res.json(data);
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(400).json({ msg: 'Greska.', error: err });
-        });
+app.get('/zivotinje', verifyToken, (req, res) => {
+    jwt.verify(req.token, 'authToken', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else if (authData.user.role === 'admin') {
+            db.select('*')
+                .from('Zivotinja')
+                .then((data) => {
+                    res.json(data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.status(400).json({ msg: 'Greska.', error: err });
+                });
+        } else {
+            res.sendStatus(403);
+            // res.json({
+            //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            // });
+        }
+    });
 });
 
 // GET ZIVOTINJA BY ID
-app.get('/zivotinje/:id', (req, res) => {
-    const id = req.params.id;
-    db.select('*')
-        .from('Zivotinja')
-        .where('sifra', '=', id)
-        .then((data) => {
-            res.json(data);
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(400).json({ msg: 'Greska.', error: err });
-        });
+app.get('/zivotinje/:id', verifyToken, (req, res) => {
+    jwt.verify(req.token, 'authToken', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else if (authData.user.role == 'admin') {
+            const id = req.params.id;
+            db.select('*')
+                .from('Zivotinja')
+                .where('sifra', '=', id)
+                .then((data) => {
+                    res.json(data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.status(400).json({ msg: 'Greska.', error: err });
+                });
+        } else {
+            res.sendStatus(403);
+            // res.json({
+            //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            // });
+        }
+    });
 });
 
 //DELETE ZIVOTINJA BY ID 
@@ -500,15 +567,27 @@ app.post('/zivotinje', verifyToken, (req, res) => {
 //#region TABLE TERMIN
 // GET ALL TERMIN
 app.get('/termini', (req, res) => {
-    db.select('*')
-        .from('Termin')
-        .then((data) => {
-            res.json(data);
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(400).json({ msg: 'Greska.', error: err });
-        });
+    jwt.verify(req.token, 'authToken', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else if (authData.user.role === 'admin') {
+            db.select('*')
+                .from('Termin')
+                .then((data) => {
+                    res.json(data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.status(400).json({ msg: 'Greska.', error: err });
+                });
+        } else {
+            res.sendStatus(403);
+            res.json({
+                message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            });
+        }
+    });
+
 });
 
 // GET TERMIN BY COMPOSITE ID
@@ -633,40 +712,66 @@ app.post('/termini', verifyToken, (req, res) => {
 
 //#region TABLE KORISNIK
 // GET ALL KORISNICI
-app.get('/korisnici', (req, res) => {
-    db.select('*')
-        .from('Korisnik')
-        .then((data) => {
-            res.json(data);
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(400).json({ msg: 'Greska.', error: err });
-        });
+app.get('/korisnici', verifyToken, (req, res) => {
+    jwt.verify(req.token, 'authToken', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else if (authData.user.role == 'admin') {
+            db.select('*')
+                .from('Korisnik')
+                .then((data) => {
+                    res.json(data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.status(400).json({ msg: 'Greska.', error: err });
+                });
+        } else {
+            res.sendStatus(403);
+            // res.json({
+            //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            // });
+        }
+    });
 });
 
 // GET KORISNIK BY ID
-app.get('/korisnici/:id', (req, res) => {
+app.get('/korisnici/:id', verifyToken, (req, res) => {
     const id = req.params.id;
-    db.select('*')
-        .from('Korisnik')
-        .where('sifra', '=', id)
-        .then((data) => {
-            res.json(data);
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(400).json({ msg: 'Greska.', error: err });
-        });
+
+    jwt.verify(req.token, 'authToken', (err, authData) => {
+        console.log(authData)
+
+        if (err) {
+            res.sendStatus(403);
+        } else if (authData.user.role === 'admin' || id == authData.user.id) {
+            db.select('*')
+                .from('Korisnik')
+                .where('sifra', '=', id)
+                .then((data) => {
+                    res.json(data);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.status(400).json({ msg: 'Greska.', error: err });
+                });
+        } else {
+            res.sendStatus(403);
+            // res.json({
+            //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            // });
+        }
+    });
 });
 
 //DELETE KORISNIK BY ID 
 app.delete('/korisnici/:id', verifyToken, (req, res) => {
+    const id = req.params.id;
+
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
-            const id = req.params.id;
+        } else if (authData.user.role === 'admin' || id == authData.user.id) {
             db('Korisnik')
                 .where('sifra', '=', id)
                 .del()
@@ -678,27 +783,24 @@ app.delete('/korisnici/:id', verifyToken, (req, res) => {
                     console.log(err);
                     res.status(400).json({ msg: 'Greska u brisanju korisnika.', error: err });
                 });
+        } else {
+            res.sendStatus(403);
+            // res.json({
+            //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
+            // });
         }
     });
-
 });
 
 //UPDATE KORISNIK
 app.put('/korisnici/:id', verifyToken, (req, res) => {
+    const id = req.params.id;
+
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
-        } else {
-            const id = req.params.id;
-            const {
-                ime,
-                prezime,
-                kontakt,
-                username,
-                password,
-                email,
-                admin
-            } = req.body;
+        } else if (id == authData.user.id || authData.user.role === 'admin') {
+            const { ime, prezime, kontakt, username, password, email, admin } = req.body;
 
             db('Korisnik')
                 .where('sifra', '=', id)
@@ -719,6 +821,11 @@ app.put('/korisnici/:id', verifyToken, (req, res) => {
                     console.log(err);
                     res.status(400).json({ msg: 'Greska u azuriranju korisnika.', error: err });
                 });
+        } else {
+            res.sendStatus(403);
+            // res.json({
+            //     message: "Nemate privilegije za izvrsavanje ovog zahteva!"
+            // });
         }
     });
 });
@@ -769,9 +876,12 @@ app.post('/login', (req, res) => {
 
             if (results.length > 0) {
                 const user = {
+                    id: results[0].sifra,
                     username: username,
-                    password: password
+                    password: password,
+                    role: results[0].admin === 1 ? 'admin' : 'korisnik'
                 };
+
                 jwt.sign({ user }, 'authToken', (err, token) => {
                     res.json({
                         token
