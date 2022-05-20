@@ -14,6 +14,52 @@ module.exports = function (app, verifyToken, db, connection) {
             });
     });
 
+    //DELETE ALL LOKACIJE - Samo Admin
+    app.delete('/lokacije', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role === 'admin') {
+                db('Lokacija')
+                    .del()
+                    .then(() => {
+                        return res.sendStatus(204);
+                    })
+                    .catch((err) => {
+                        res.status(404).json({ msg: 'Greska u brisanju lokacije.', error: err });
+                    });
+            } else {
+                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+
+    });
+
+    //UPDATE ALL LOKACIJE - Samo Admin
+    app.put('/lokacije', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role === 'admin') {
+                const { naziv } = req.body;
+                db('Lokacija')
+                    .update(
+                        {
+                            naziv: naziv
+                        }
+                    ).then(() => {
+                        return res.status(200).json({ msg: 'Sve Lokacije Azurirane.' });
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.status(409).json({ msg: 'Greska u azuriranju svih lokacija.', error: err });
+                    });
+            } else {
+                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+    });
+
     // GET LOKACIJA BY ID - Nema ogranicenja
     app.get('/lokacije/:id', (req, res) => {
         const id = req.params.id;

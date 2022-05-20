@@ -25,6 +25,90 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
+    //CREATE KORISNIK - Nema ogranicenja
+    app.post('/korisnici', (req, res) => {
+        const {
+            ime,
+            prezime,
+            kontakt,
+            username,
+            password,
+            email,
+            admin
+        } = req.body;
+
+        db('Korisnik')
+            .insert({
+                prezime: prezime,
+                ime: ime,
+                kontakt: kontakt,
+                username: username,
+                password: password,
+                email: email,
+                admin: admin
+            })
+            .then(() => {
+
+                return res.json({ msg: 'Korisnik Kreiran' });
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log('Status code:' + res.statusCode);
+                res.status(400).json({ msg: 'Greska u kreiranju korisnika.', error: err });
+            })
+    });
+
+    //DELETE ALL KORISNICI - samo Admin 
+    app.delete('/korisnici', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role === 'admin') {
+                db('Korisnik')
+                    .del()
+                    .then(() => {
+                        return res.sendStatus(204);
+                    })
+                    .catch((err) => {
+                        res.status(404).json({ msg: 'Greska u brisanju svih korisnika.', error: err });
+                    });
+            } else {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+    });
+
+    //UPDATE ALL KORISNICI - samo Admin 
+    app.put('/korisnici', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role === 'admin') {
+                const { ime, prezime, kontakt, username, password, email, admin } = req.body;
+
+                db('Korisnik')
+                    .update(
+                        {
+                            prezime: prezime,
+                            ime: ime,
+                            kontakt: kontakt,
+                            username: username,
+                            password: password,
+                            email: email,
+                            admin: admin
+                        }
+                    ).then(() => {
+                        return res.status(200).json({ msg: 'Svi korisnici su azurirani.' });
+                    })
+                    .catch((err) => {
+                        res.status(409).json({ msg: 'Greska u azuriranju svih korisnika.', error: err });
+                    });
+            } else {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+    });
+
     // GET KORISNIK BY ID - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
     app.get('/korisnici/:id', verifyToken, (req, res) => {
         const id = req.params.id;
@@ -118,38 +202,5 @@ module.exports = function (app, verifyToken, db, connection) {
                 // });
             }
         });
-    });
-
-    //CREATE KORISNIK - Nema nikakvih ogranicenja
-    app.post('/korisnici', (req, res) => {
-        const {
-            ime,
-            prezime,
-            kontakt,
-            username,
-            password,
-            email,
-            admin
-        } = req.body;
-
-        db('Korisnik')
-            .insert({
-                prezime: prezime,
-                ime: ime,
-                kontakt: kontakt,
-                username: username,
-                password: password,
-                email: email,
-                admin: admin
-            })
-            .then(() => {
-
-                return res.json({ msg: 'Korisnik Kreiran' });
-            })
-            .catch((err) => {
-                console.log(err);
-                console.log('Status code:' + res.statusCode);
-                res.status(400).json({ msg: 'Greska u kreiranju korisnika.', error: err });
-            })
     });
 }

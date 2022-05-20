@@ -14,6 +14,51 @@ module.exports = function (app, verifyToken, db, connection) {
             });
     });
 
+    //DELETE ALL RASE - Samo Admin
+    app.delete('/rase', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role == 'admin') {
+                db('Rasa')
+                    .del()
+                    .then(() => {
+                        return res.sendStatus(204);
+                    })
+                    .catch((err) => {
+                        return res.status(404).json({ msg: 'Greska u brisanju svih rasa.', error: err });
+                    });
+            } else {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+    });
+
+    //UPDATE ALL RASE - Samo Admin
+    app.put('/rase', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role === 'admin') {
+                const { naziv } = req.body;
+
+                db('Rasa')
+                    .update(
+                        {
+                            naziv: naziv
+                        }
+                    ).then(() => {
+                        return res.status(200).json({ msg: 'Sve Rase Azurirane.' });
+                    })
+                    .catch((err) => {
+                        res.status(409).json({ msg: 'Greska u azuriranju svih rasa.', error: err });
+                    });
+            } else {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+    });
+
     // GET RASA BY ID - Nema ogranicenja
     app.get('/rase/:id', (req, res) => {
         const id = req.params.id;
@@ -55,7 +100,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/rase/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role === 'admin') {
                 const id = req.params.id;
                 const {
@@ -76,10 +121,7 @@ module.exports = function (app, verifyToken, db, connection) {
                         res.status(400).json({ msg: 'Greska u azuriranju rase.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                // });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });

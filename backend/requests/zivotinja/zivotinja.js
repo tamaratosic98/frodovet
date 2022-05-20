@@ -25,6 +25,55 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
+    //UPDATE ALL ZIVOTINJE - samo Admin
+    app.put('/zivotinje', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role == 'admin') {
+                const { ime, datumRodjenja, starost, vlasnik, kontaktVlasnika, rasa } = req.body;
+                db('Zivotinja')
+                    .update(
+                        {
+                            ime: ime,
+                            vlasnik: vlasnik,
+                            starost: starost,
+                            datumRodjenja: datumRodjenja,
+                            kontaktVlasnika: kontaktVlasnika,
+                            rasa: rasa
+                        }
+                    ).then(() => {
+                        return res.status(200).json({ msg: 'Sve Zivotinje Azurirane.' });
+                    })
+                    .catch((err) => {
+                        return res.status(409).json({ msg: 'Greska u azuriranju svih zivotinja.', error: err });
+                    });
+            } else {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+    });
+
+    //DELETE ALL ZIVOTINJE - samo Admin
+    app.delete('/zivotinje', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role == 'admin') {
+                db('Zivotinja')
+                    .del()
+                    .then(() => {
+                        return res.sendStatus(204);
+                    })
+                    .catch((err) => {
+                        res.status(404).json({ msg: 'Greska u brisanju svih zivotinja.', error: err });
+                    });
+            } else {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+    });
+
     // GET ZIVOTINJA BY ID - Moze pristupiti Admin, ili korisnik ukoliko je vlasnik te zivotinje
     app.get('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
@@ -90,7 +139,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE ZIVOTINJA - Moze pristupiti Admin, ili korisnik ukoliko je vlasnik te zivotinje
+    //UPDATE ZIVOTINJA BY ID - Moze pristupiti Admin, ili korisnik ukoliko je vlasnik te zivotinje
     app.put('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {

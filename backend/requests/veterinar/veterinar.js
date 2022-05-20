@@ -14,6 +14,55 @@ module.exports = function (app, verifyToken, db, connection) {
             });
     });
 
+    //DELETE ALL VETERINARI - Samo Admin
+    app.delete('/veterinari', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role == 'admin') {
+                db('Veterinar')
+                    .del()
+                    .then(() => {
+                        return res.sendStatus(204);
+                    })
+                    .catch((err) => {
+                        res.status(404).json({ msg: 'Greska u brisanju svih veterinara.', error: err });
+                    });
+            } else {
+                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+    });
+
+    //UPDATE ALL VETERINARI - Samo Admin
+    app.put('/veterinari', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            } else if (authData.user.role == 'admin') {
+                const { ime, prezime, datumRodjenja, adresa, telefon, grad } = req.body;
+                db('Veterinar')
+                    .update(
+                        {
+                            prezime: prezime,
+                            ime: ime,
+                            datumRodjenja: datumRodjenja,
+                            adresa: adresa,
+                            telefon: telefon,
+                            grad: grad
+                        }
+                    ).then(() => {
+                        return res.status(200).json({ msg: 'Svi Veterinari Azurirani' });
+                    })
+                    .catch((err) => {
+                        res.status(409).json({ msg: 'Greska u azuriranju svih veterinara.', error: err });
+                    });
+            } else {
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+            }
+        });
+    });
+
     // GET VETERINAR BY ID - Nema ogranicenja
     app.get('/veterinari/:id', (req, res) => {
         const id = req.params.id;
