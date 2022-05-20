@@ -33,25 +33,20 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/rase/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role == 'admin') {
                 const id = req.params.id;
                 db('Rasa')
                     .where('sifra', '=', id)
                     .del()
                     .then(() => {
-                        console.log('Rasa Obrisana');
-                        return res.json({ msg: 'Rasa Obrisana' });
+                        return res.sendStatus(204);
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska u brisanju rase.', error: err });
+                        res.status(404).json({ msg: 'Greska u brisanju rase.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                // });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });

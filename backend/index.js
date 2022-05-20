@@ -85,10 +85,7 @@ function verifyToken(req, res, next) {
         req.token = bearer;
         next();
     } else {
-        res.sendStatus(403);
-        // res.json({
-        //     message: 'Nemate dozvolu da izvrsite ovaj zahtev.'
-        // })
+        res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
     };
 }
 

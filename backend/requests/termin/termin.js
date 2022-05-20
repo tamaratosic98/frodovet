@@ -26,6 +26,94 @@ module.exports = function (app, verifyToken, db, connection) {
 
     });
 
+    //UPDATE ALL TERMINI  - samo Admin
+    app.put('/termini', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                res.sendStatus(403);
+            } else if (authData.user.role == 'admin') {
+                const { recept, dijagnoza, napomena } = req.body;
+
+                db('Termin')
+                    .update(
+                        {
+                            dijagnoza: dijagnoza,
+                            recept: recept,
+                            napomena: napomena
+                        }
+                    ).then(() => {
+                        return res.json({ msg: 'Svi Termini Azuriran' });
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.status(400).json({ msg: 'Greska u azuriranju svih termina.', error: err });
+                    });
+            } else {
+                res.sendStatus(403);
+                // res.send('Nemate dozvolu za azuriranje ovog termina.');
+            }
+        });
+    });
+
+    //DELETE ALL TERMINI - samo Admin 
+    app.delete('/termini', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                res.sendStatus(403);
+            } else if (authData.user.role == 'admin') {
+                db('Termin')
+                    .del()
+                    .then(() => {
+                        return res.json({ msg: 'Svi Termini Obrisani' });
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.status(400).json({ msg: 'Greska u brisanju svih termina.', error: err });
+                    });
+            } else {
+                res.sendStatus(403);
+                // res.send('Nemate dozvolu za brisanje ovog termina.');
+            }
+        });
+    });
+
+    //CREATE TERMIN Ulogovani Admin ili korisnik
+    app.post('/termini', verifyToken, (req, res) => {
+        jwt.verify(req.token, 'authToken', (err, authData) => {
+            if (err) {
+                res.sendStatus(403);
+            } else {
+                const {
+                    recept,
+                    dijagnoza,
+                    napomena,
+                    pregledao,
+                    zivotinja,
+                    datum
+                } = req.body;
+
+                db('Termin')
+                    .insert({
+                        dijagnoza: dijagnoza,
+                        recept: recept,
+                        napomena: napomena,
+                        pregledao: pregledao,
+                        zivotinja: zivotinja,
+                        datum: datum
+                    })
+                    .then(() => {
+
+                        return res.json({ msg: 'Termin Kreiran' });
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        console.log('Status code:' + res.statusCode);
+                        res.status(400).json({ msg: 'Greska u kreiranju termina.', error: err });
+                    })
+            }
+        });
+    });
+
     // GET TERMIN BY COMPOSITE ID - Admin ili korisnik koji je vlasnik zivotinje
     app.get('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
@@ -140,43 +228,6 @@ module.exports = function (app, verifyToken, db, connection) {
                         // res.send('Nemate dozvolu za azuriranje ovog termina.');
                     }
                 });
-            }
-        });
-    });
-
-    //CREATE TERMIN Ulogovani Admin ili korisnik
-    app.post('/termini', verifyToken, (req, res) => {
-        jwt.verify(req.token, 'authToken', (err, authData) => {
-            if (err) {
-                res.sendStatus(403);
-            } else {
-                const {
-                    recept,
-                    dijagnoza,
-                    napomena,
-                    pregledao,
-                    zivotinja,
-                    datum
-                } = req.body;
-
-                db('Termin')
-                    .insert({
-                        dijagnoza: dijagnoza,
-                        recept: recept,
-                        napomena: napomena,
-                        pregledao: pregledao,
-                        zivotinja: zivotinja,
-                        datum: datum
-                    })
-                    .then(() => {
-
-                        return res.json({ msg: 'Termin Kreiran' });
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        console.log('Status code:' + res.statusCode);
-                        res.status(400).json({ msg: 'Greska u kreiranju termina.', error: err });
-                    })
             }
         });
     });
