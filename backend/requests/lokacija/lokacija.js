@@ -16,7 +16,7 @@ module.exports = function (app, verifyToken, db, connection) {
             });
     });
 
-    //DELETE ALL LOKACIJE - Samo Admin
+    // DELETE ALL LOKACIJE - Samo Admin
     app.delete('/lokacije', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -39,7 +39,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE ALL LOKACIJE - Samo Admin
+    // UPDATE ALL LOKACIJE - Samo Admin
     app.put('/lokacije', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -83,7 +83,7 @@ module.exports = function (app, verifyToken, db, connection) {
             });
     });
 
-    //DELETE LOKACIJA BY ID - Samo Admin
+    // DELETE LOKACIJA BY ID - Samo Admin
     app.delete('/lokacije/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -108,7 +108,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE LOKACIJA - Samo Admin
+    // UPDATE LOKACIJA - Samo Admin
     app.put('/lokacije/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -138,35 +138,32 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //CREATE LOKACIJA - Samo Admin
+    // CREATE LOKACIJA - Samo Admin
     app.post('/lokacije', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role === 'admin') {
-                const {
-                    sifra,
-                    naziv
-                } = req.body;
+                const { naziv } = req.body;
+
+                if (!naziv) {
+                    return res.status(400).json({ msg: 'Greska u kreiranju lokacije.' });
+                };
 
                 db('Lokacija')
                     .insert({
-                        sifra: sifra,
                         naziv: naziv
                     })
-                    .then(() => {
-                        return res.json({ msg: 'Lokacija Kreirana' });
+                    .then((data) => {
+                        if (!!data) {
+                            return res.status(201).json({ msg: 'Lokacija Kreirana' });
+                        }
                     })
                     .catch((err) => {
-                        console.log(err);
-                        console.log('Status code:' + res.statusCode);
                         res.status(400).json({ msg: 'Greska u kreiranju lokacije.', error: err });
                     })
             } else {
-                res.sendStatus(403);
-                res.json({
-                    message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
 

@@ -26,15 +26,11 @@ module.exports = function (app, verifyToken, db, connection) {
 
     // CREATE KORISNIK - Nema ogranicenja
     app.post('/korisnici', (req, res) => {
-        const {
-            ime,
-            prezime,
-            kontakt,
-            username,
-            password,
-            email,
-            admin
-        } = req.body;
+        const { ime, prezime, kontakt, username, password, email, admin } = req.body;
+
+        if (!ime && !prezime && !kontakt && !username && !password && !email && !admin) {
+            return res.status(400).json({ msg: 'Greska u kreiranju korisnika.' });
+        };
 
         db('Korisnik')
             .insert({
@@ -46,13 +42,12 @@ module.exports = function (app, verifyToken, db, connection) {
                 email: email,
                 admin: admin
             })
-            .then(() => {
-
-                return res.json({ msg: 'Korisnik Kreiran' });
+            .then((data) => {
+                if (!!data) {
+                    return res.status(201).json({ msg: 'Korisnik Kreiran' });
+                }
             })
             .catch((err) => {
-                console.log(err);
-                console.log('Status code:' + res.statusCode);
                 res.status(400).json({ msg: 'Greska u kreiranju korisnika.', error: err });
             })
     });

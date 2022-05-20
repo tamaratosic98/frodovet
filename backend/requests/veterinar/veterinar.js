@@ -152,9 +152,13 @@ module.exports = function (app, verifyToken, db, connection) {
     app.post('/veterinari', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role == 'admin') {
                 const { jmbg, ime, datumRodjenja, prezime, adresa, telefon, grad } = req.body;
+
+                if (!jmbg && !ime && !datumRodjenja && !prezime && !adresa && !telefon && !grad) {
+                    return res.status(400).json({ msg: 'Greska u kreiranju veterinara.' });
+                };
 
                 db('Veterinar')
                     .insert({
@@ -166,22 +170,18 @@ module.exports = function (app, verifyToken, db, connection) {
                         telefon: telefon,
                         grad: grad
                     })
-                    .then(() => {
-                        return res.json({ msg: 'Veterinar Kreiran', authData: authData });
+                    .then((data) => {
+                        if (!!data) {
+                            return res.status(201).json({ msg: 'Veterinar Kreiran' });
+                        }
                     })
                     .catch((err) => {
-                        console.log(err);
-                        console.log('Status code:' + res.statusCode);
                         res.status(400).json({ msg: 'Greska u kreiranju veterinara.', error: err });
                     })
             } else {
-                res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                // });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
 
     });
-
 }

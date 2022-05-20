@@ -24,7 +24,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE ALL TERMINI  - samo Admin
+    // UPDATE ALL TERMINI  - samo Admin
     app.put('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -54,7 +54,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //DELETE ALL TERMINI - samo Admin 
+    // DELETE ALL TERMINI - samo Admin 
     app.delete('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -77,20 +77,17 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //CREATE TERMIN Ulogovani Admin ili korisnik
+    // CREATE TERMIN Ulogovani Admin ili korisnik
     app.post('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else {
-                const {
-                    recept,
-                    dijagnoza,
-                    napomena,
-                    pregledao,
-                    zivotinja,
-                    datum
-                } = req.body;
+                const { recept, dijagnoza, napomena, pregledao, zivotinja, datum } = req.body;
+
+                if (!recept && !dijagnoza && !napomena && !pregledao && !zivotinja && !datum) {
+                    return res.status(400).json({ msg: 'Greska u kreiranju termina.' });
+                };
 
                 db('Termin')
                     .insert({
@@ -101,13 +98,12 @@ module.exports = function (app, verifyToken, db, connection) {
                         zivotinja: zivotinja,
                         datum: datum
                     })
-                    .then(() => {
-
-                        return res.json({ msg: 'Termin Kreiran' });
+                    .then((data) => {
+                        if (!!data) {
+                            return res.status(201).json({ msg: 'Termin Kreiran' });
+                        }
                     })
                     .catch((err) => {
-                        console.log(err);
-                        console.log('Status code:' + res.statusCode);
                         res.status(400).json({ msg: 'Greska u kreiranju termina.', error: err });
                     })
             }
@@ -151,7 +147,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //DELETE TERMIN BY COMPOSITE ID - Admin ili korisnik koji je vlasnik zivotinje
+    // DELETE TERMIN BY COMPOSITE ID - Admin ili korisnik koji je vlasnik zivotinje
     app.delete('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -187,7 +183,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE TERMIN BY COMPOSITE ID - Admin ili korisnik koji je vlasnik zivotinje
+    // UPDATE TERMIN BY COMPOSITE ID - Admin ili korisnik koji je vlasnik zivotinje
     app.put('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {

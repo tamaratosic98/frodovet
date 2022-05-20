@@ -145,31 +145,29 @@ module.exports = function (app, verifyToken, db, connection) {
     app.post('/rase', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role === 'admin') {
-                const {
-                    sifra,
-                    naziv
-                } = req.body;
+                const { sifra, naziv } = req.body;
+
+                if (!naziv && !sifra) {
+                    return res.status(400).json({ msg: 'Greska u kreiranju rase.' });
+                };
 
                 db('Rasa')
                     .insert({
                         sifra: sifra,
                         naziv: naziv
                     })
-                    .then(() => {
-                        return res.json({ msg: 'Rasa Kreirana' });
+                    .then((data) => {
+                        if (!!data) {
+                            return res.status(201).json({ msg: 'Rasa Kreirana' });
+                        }
                     })
                     .catch((err) => {
-                        console.log(err);
-                        console.log('Status code:' + res.statusCode);
                         res.status(400).json({ msg: 'Greska u kreiranju rase.', error: err });
                     })
             } else {
-                res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                // });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });

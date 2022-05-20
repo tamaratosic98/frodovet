@@ -192,16 +192,13 @@ module.exports = function (app, verifyToken, db, connection) {
     app.post('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else {
-                const {
-                    ime,
-                    datumRodjenja,
-                    starost,
-                    vlasnik,
-                    kontaktVlasnika,
-                    rasa
-                } = req.body;
+                const { ime, datumRodjenja, starost, vlasnik, kontaktVlasnika, rasa } = req.body;
+
+                if (!ime && !datumRodjenja && !starost && !vlasnik && !kontaktVlasnika && !rasa) {
+                    return res.status(400).json({ msg: 'Greska u kreiranju zivotinje.' });
+                };
 
                 db('Zivotinja')
                     .insert({
@@ -212,12 +209,12 @@ module.exports = function (app, verifyToken, db, connection) {
                         kontaktVlasnika: kontaktVlasnika,
                         rasa: rasa
                     })
-                    .then(() => {
-                        return res.json({ msg: 'Zivotinja Kreirana' });
+                    .then((data) => {
+                        if (!!data) {
+                            return res.status(201).json({ msg: 'Zivotinja Kreirana' });
+                        }
                     })
                     .catch((err) => {
-                        console.log(err);
-                        console.log('Status code:' + res.statusCode);
                         res.status(400).json({ msg: 'Greska u kreiranju zivotinje.', error: err });
                     })
             }
