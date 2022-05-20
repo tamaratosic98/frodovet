@@ -5,24 +5,26 @@ module.exports = function (app, verifyToken, db, connection) {
     app.get('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role === 'admin') {
                 db.select('*')
                     .from('Zivotinja')
                     .then((data) => {
-                        res.json(data);
+                        if (!!data) {
+                            return res.status(200).json(data);
+                        }
+                        res.sendStatus(204);
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska.', error: err });
+                        res.status(404).json({ msg: 'Greska.', error: err });
                     });
             } else {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });
 
-    //UPDATE ALL ZIVOTINJE - samo Admin
+    // UPDATE ALL ZIVOTINJE - samo Admin
     app.put('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -54,7 +56,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //DELETE ALL ZIVOTINJE - samo Admin
+    // DELETE ALL ZIVOTINJE - samo Admin
     app.delete('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -93,10 +95,13 @@ module.exports = function (app, verifyToken, db, connection) {
                             .from('Zivotinja')
                             .where('sifra', '=', id)
                             .then((data) => {
-                                res.json(data);
+                                if (!!data) {
+                                    return res.status(200).json(data);
+                                }
+                                res.sendStatus(204);
                             })
                             .catch((err) => {
-                                res.status(409).json({ msg: 'Greska.', error: err });
+                                res.status(404).json({ msg: 'Greska.', error: err });
                             });
 
                     } else {
@@ -107,7 +112,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //DELETE ZIVOTINJA BY ID - Moze pristupiti Admin, ili korisnik ukoliko je vlasnik te zivotinje
+    // DELETE ZIVOTINJA BY ID - Moze pristupiti Admin, ili korisnik ukoliko je vlasnik te zivotinje
     app.delete('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -140,7 +145,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE ZIVOTINJA BY ID - Moze pristupiti Admin, ili korisnik ukoliko je vlasnik te zivotinje
+    // UPDATE ZIVOTINJA BY ID - Moze pristupiti Admin, ili korisnik ukoliko je vlasnik te zivotinje
     app.put('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -183,7 +188,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //CREATE ZIVOTINJA - Ulogovani Admin ili korisnik
+    // CREATE ZIVOTINJA - Ulogovani Admin ili korisnik
     app.post('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {

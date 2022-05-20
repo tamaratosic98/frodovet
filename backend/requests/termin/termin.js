@@ -1,29 +1,27 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = function (app, verifyToken, db, connection) {
-    // GET ALL TERMIN - Ulogovani Admin ili korisnik
+    // GET ALL TERMINI - Ulogovani Admin ili korisnik
     app.get('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role === 'admin') {
                 db.select('*')
                     .from('Termin')
                     .then((data) => {
-                        res.json(data);
+                        if (!!data) {
+                            return res.status(200).json(data);
+                        }
+                        res.sendStatus(204);
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska.', error: err });
+                        res.status(404).json({ msg: 'Greska.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                res.json({
-                    message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
-
     });
 
     //UPDATE ALL TERMINI  - samo Admin
@@ -120,7 +118,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.get('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else {
                 const idZivotinje = req.params.idZivotinje;
                 const idVeterinara = req.params.idVeterinara;
@@ -136,16 +134,17 @@ module.exports = function (app, verifyToken, db, connection) {
                             .where('pregledao', '=', idVeterinara)
                             .where('datum', '=', datum)
                             .then((data) => {
-                                res.json(data);
+                                if (!!data) {
+                                    return res.status(200).json(data);
+                                }
+                                res.sendStatus(204);
                             })
                             .catch((err) => {
-                                console.log(err);
-                                res.status(400).json({ msg: 'Greska.', error: err });
+                                res.status(404).json({ msg: 'Greska.', error: err });
                             });
 
                     } else {
-                        res.sendStatus(403);
-                        // res.send('Nemate dozvolu za pregled ovog termina.');
+                        res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
                     }
                 });
             }

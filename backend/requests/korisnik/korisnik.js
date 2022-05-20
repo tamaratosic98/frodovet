@@ -5,22 +5,21 @@ module.exports = function (app, verifyToken, db, connection) {
     app.get('/korisnici', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role == 'admin') {
                 db.select('*')
                     .from('Korisnik')
                     .then((data) => {
-                        res.json(data);
+                        if (!!data) {
+                            return res.status(200).json(data);
+                        }
+                        res.sendStatus(204);
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska.', error: err });
+                        res.status(404).json({ msg: 'Greska.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                // });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });
@@ -120,26 +119,23 @@ module.exports = function (app, verifyToken, db, connection) {
         const id = req.params.id;
 
         jwt.verify(req.token, 'authToken', (err, authData) => {
-            console.log(authData)
-
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role === 'admin' || id == authData.user.id) {
                 db.select('*')
                     .from('Korisnik')
                     .where('sifra', '=', id)
                     .then((data) => {
-                        res.json(data);
+                        if (!!data) {
+                            return res.status(200).json(data);
+                        }
+                        res.sendStatus(204);
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska.', error: err });
+                        res.status(404).json({ msg: 'Greska.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                // });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });

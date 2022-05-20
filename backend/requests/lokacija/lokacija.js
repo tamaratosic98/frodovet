@@ -6,11 +6,13 @@ module.exports = function (app, verifyToken, db, connection) {
         db.select('*')
             .from('Lokacija')
             .then((data) => {
-                res.json(data);
+                if (!!data) {
+                    return res.status(200).json(data);
+                }
+                res.sendStatus(204);
             })
             .catch((err) => {
-                console.log(err);
-                res.status(400).json({ msg: 'Greska.', error: err });
+                res.status(404).json({ msg: 'Greska.', error: err });
             });
     });
 
@@ -71,11 +73,13 @@ module.exports = function (app, verifyToken, db, connection) {
             .from('Lokacija')
             .where('sifra', '=', id)
             .then((data) => {
-                res.json(data);
+                if (!!data) {
+                    return res.status(200).json(data);
+                }
+                res.sendStatus(204);
             })
             .catch((err) => {
-                console.log(err);
-                res.status(400).json({ msg: 'Greska.', error: err });
+                res.status(404).json({ msg: 'Greska.', error: err });
             });
     });
 
