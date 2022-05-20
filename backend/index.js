@@ -85,7 +85,7 @@ function verifyToken(req, res, next) {
         req.token = bearer;
         next();
     } else {
-        res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+        res.status(401).json({ msg: 'Molimo vas ulogujte se da biste nastavili.' });
     };
 }
 

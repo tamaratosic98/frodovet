@@ -5,7 +5,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.get('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 db.select('*')
                     .from('Termin')
@@ -28,7 +28,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role == 'admin') {
                 const { recept, dijagnoza, napomena } = req.body;
 
@@ -58,7 +58,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role == 'admin') {
                 db('Termin')
                     .del()
@@ -81,7 +81,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.post('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else {
                 const { recept, dijagnoza, napomena, pregledao, zivotinja, datum } = req.body;
 
@@ -114,7 +114,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.get('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else {
                 const idZivotinje = req.params.idZivotinje;
                 const idVeterinara = req.params.idVeterinara;
@@ -151,7 +151,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else {
                 const idZivotinje = req.params.idZivotinje;
                 const idVeterinara = req.params.idVeterinara;
@@ -187,7 +187,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else {
                 const idZivotinje = req.params.idZivotinje;
                 const idVeterinara = req.params.idVeterinara;

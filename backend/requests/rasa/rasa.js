@@ -20,7 +20,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/rase', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role == 'admin') {
                 db('Rasa')
                     .del()
@@ -43,7 +43,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/rase', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 const { naziv } = req.body;
 
@@ -88,7 +88,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/rase/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role == 'admin') {
                 const id = req.params.id;
                 db('Rasa')
@@ -113,7 +113,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/rase/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 const id = req.params.id;
                 const {
@@ -145,7 +145,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.post('/rase', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 const { sifra, naziv } = req.body;
 

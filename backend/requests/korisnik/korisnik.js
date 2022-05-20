@@ -5,7 +5,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.get('/korisnici', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role == 'admin') {
                 db.select('*')
                     .from('Korisnik')
@@ -56,7 +56,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/korisnici', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 db('Korisnik')
                     .del()
@@ -79,7 +79,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/korisnici', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 const { ime, prezime, kontakt, username, password, email, admin } = req.body;
 
@@ -115,7 +115,7 @@ module.exports = function (app, verifyToken, db, connection) {
 
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin' || id == authData.user.id) {
                 db.select('*')
                     .from('Korisnik')
@@ -141,7 +141,7 @@ module.exports = function (app, verifyToken, db, connection) {
 
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin' || id == authData.user.id) {
                 db('Korisnik')
                     .where('sifra', '=', id)
@@ -167,7 +167,7 @@ module.exports = function (app, verifyToken, db, connection) {
 
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (id == authData.user.id || authData.user.role === 'admin') {
                 const { ime, prezime, kontakt, username, password, email, admin } = req.body;
 

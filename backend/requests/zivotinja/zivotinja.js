@@ -5,7 +5,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.get('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 db.select('*')
                     .from('Zivotinja')
@@ -28,7 +28,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role == 'admin') {
                 const { ime, datumRodjenja, starost, vlasnik, kontaktVlasnika, rasa } = req.body;
                 db('Zivotinja')
@@ -60,7 +60,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role == 'admin') {
                 db('Zivotinja')
                     .del()
@@ -83,7 +83,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.get('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else {
                 const id = req.params.id;
                 connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [id], function (error, results, fields) {
@@ -116,7 +116,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else {
                 const id = req.params.id;
                 connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [id], function (error, results, fields) {
@@ -149,7 +149,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else {
                 const id = req.params.id;
                 connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [id], function (error, results, fields) {
@@ -192,7 +192,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.post('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else {
                 const { ime, datumRodjenja, starost, vlasnik, kontaktVlasnika, rasa } = req.body;
 

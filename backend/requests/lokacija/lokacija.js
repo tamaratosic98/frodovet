@@ -20,7 +20,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/lokacije', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 db('Lokacija')
                     .del()
@@ -43,7 +43,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/lokacije', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                return res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 const { naziv } = req.body;
                 db('Lokacija')
@@ -87,7 +87,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/lokacije/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 const id = req.params.id;
                 db('Lokacija')
@@ -112,7 +112,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/lokacije/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 const id = req.params.id;
                 const { naziv } = req.body;
@@ -142,7 +142,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.post('/lokacije', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
+                return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
                 const { naziv } = req.body;
 
