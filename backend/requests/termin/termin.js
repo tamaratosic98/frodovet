@@ -59,20 +59,21 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role == 'admin') {
                 db('Termin')
                     .del()
-                    .then(() => {
-                        return res.json({ msg: 'Svi Termini Obrisani' });
+                    .then((data) => {
+                        if (!!data) {
+                            return res.sendStatus(204);
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za brisanje.' });
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska u brisanju svih termina.', error: err });
+                        res.status(404).json({ msg: 'Greska u brisanju svih termina.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                // res.send('Nemate dozvolu za brisanje ovog termina.');
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });
@@ -154,14 +155,14 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else {
                 const idZivotinje = req.params.idZivotinje;
                 const idVeterinara = req.params.idVeterinara;
                 const datum = req.params.datum;
                 connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [idZivotinje], function (error, results, fields) {
                     if (error) {
-                        throw error
+                        throw error;
                     }
                     if (authData.user.role == 'admin' || (results.length > 0 && results[0].vlasnik == authData.user.id)) {
                         db('Termin')
@@ -169,17 +170,17 @@ module.exports = function (app, verifyToken, db, connection) {
                             .where('pregledao', '=', idVeterinara)
                             .where('datum', '=', datum)
                             .del()
-                            .then(() => {
-                                console.log('Termin Obrisan');
-                                return res.json({ msg: 'Termin Obrisan' });
+                            .then((data) => {
+                                if (!!data) {
+                                    return res.sendStatus(204);
+                                }
+                                res.status(404).json({ msg: 'Termin sa zadatim id-em ne postoji.' });
                             })
                             .catch((err) => {
-                                console.log(err);
-                                res.status(400).json({ msg: 'Greska u brisanju termina.', error: err });
+                                res.status(404).json({ msg: 'Greska u brisanju termina.', error: err });
                             });
                     } else {
-                        res.sendStatus(403);
-                        // res.send('Nemate dozvolu za brisanje ovog termina.');
+                        res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
                     }
                 });
             }

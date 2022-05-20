@@ -22,8 +22,11 @@ module.exports = function (app, verifyToken, db, connection) {
             } else if (authData.user.role == 'admin') {
                 db('Rasa')
                     .del()
-                    .then(() => {
-                        return res.sendStatus(204);
+                    .then((data) => {
+                        if (!!data) {
+                            return res.sendStatus(204);
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za brisanje.' });
                     })
                     .catch((err) => {
                         return res.status(404).json({ msg: 'Greska u brisanju svih rasa.', error: err });
@@ -84,8 +87,11 @@ module.exports = function (app, verifyToken, db, connection) {
                 db('Rasa')
                     .where('sifra', '=', id)
                     .del()
-                    .then(() => {
-                        return res.sendStatus(204);
+                    .then((data) => {
+                        if (!!data) {
+                            return res.sendStatus(204);
+                        }
+                        res.status(404).json({ msg: 'Rasa sa zadatim id-em ne postoji.' });
                     })
                     .catch((err) => {
                         res.status(404).json({ msg: 'Greska u brisanju rase.', error: err });

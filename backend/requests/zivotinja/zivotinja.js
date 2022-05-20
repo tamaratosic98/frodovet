@@ -18,9 +18,6 @@ module.exports = function (app, verifyToken, db, connection) {
                     });
             } else {
                 res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                // });
             }
         });
     });
@@ -62,8 +59,11 @@ module.exports = function (app, verifyToken, db, connection) {
             } else if (authData.user.role == 'admin') {
                 db('Zivotinja')
                     .del()
-                    .then(() => {
-                        return res.sendStatus(204);
+                    .then((data) => {
+                        if (!!data) {
+                            return res.sendStatus(204);
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za brisanje.' });
                     })
                     .catch((err) => {
                         res.status(404).json({ msg: 'Greska u brisanju svih zivotinja.', error: err });
@@ -78,7 +78,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.get('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else {
                 const id = req.params.id;
                 connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [id], function (error, results, fields) {
@@ -93,13 +93,11 @@ module.exports = function (app, verifyToken, db, connection) {
                                 res.json(data);
                             })
                             .catch((err) => {
-                                console.log(err);
-                                res.status(400).json({ msg: 'Greska.', error: err });
+                                res.status(409).json({ msg: 'Greska.', error: err });
                             });
 
                     } else {
-                        res.sendStatus(403);
-                        // res.send('Nemate dozvolu za pregled ovog ljubimca.');
+                        res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
                     }
                 });
             }
@@ -110,7 +108,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.delete('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else {
                 const id = req.params.id;
                 connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [id], function (error, results, fields) {
@@ -122,17 +120,17 @@ module.exports = function (app, verifyToken, db, connection) {
                         db('Zivotinja')
                             .where('sifra', '=', id)
                             .del()
-                            .then(() => {
-                                console.log('Zivotinja Obrisana');
-                                return res.json({ msg: 'Zivotinja Obrisana' });
+                            .then((data) => {
+                                if (!!data) {
+                                    return res.sendStatus(204);
+                                }
+                                res.status(404).json({ msg: 'Zivotinja sa zadatim id-em ne postoji.' });
                             })
                             .catch((err) => {
-                                console.log(err);
-                                res.status(400).json({ msg: 'Greska u brisanju zivotinje.', error: err });
+                                res.status(404).json({ msg: 'Greska u brisanju zivotinje.', error: err });
                             });
                     } else {
-                        res.sendStatus(403);
-                        // res.send('Nemate dozvolu za pregled ovog ljubimca.');
+                        res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
                     }
                 });
             }

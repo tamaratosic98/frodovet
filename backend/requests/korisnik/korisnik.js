@@ -67,7 +67,10 @@ module.exports = function (app, verifyToken, db, connection) {
                 db('Korisnik')
                     .del()
                     .then(() => {
-                        return res.sendStatus(204);
+                        if (!!data) {
+                            return res.sendStatus(204);
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za brisanje.' });
                     })
                     .catch((err) => {
                         res.status(404).json({ msg: 'Greska u brisanju svih korisnika.', error: err });
@@ -144,24 +147,22 @@ module.exports = function (app, verifyToken, db, connection) {
 
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role === 'admin' || id == authData.user.id) {
                 db('Korisnik')
                     .where('sifra', '=', id)
                     .del()
-                    .then(() => {
-                        console.log('Korisnik Obrisan');
-                        return res.json({ msg: 'Korisnik Obrisan' });
+                    .then((data) => {
+                        if (!!data) {
+                            return res.sendStatus(204);
+                        }
+                        res.status(404).json({ msg: 'Korisnik sa zadatim id-em ne postoji.' });
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska u brisanju korisnika.', error: err });
+                        res.status(404).json({ msg: 'Greska u brisanju korisnika.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                // });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });
