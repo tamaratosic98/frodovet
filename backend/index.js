@@ -31,7 +31,7 @@ const connection = mysql.createConnection({
 //#endregion
 
 //#region TABLE VETERINAR
-// GET ALL VETERINARI
+// GET ALL VETERINARI - Nema ogranicenja
 app.get('/veterinari', (req, res) => {
     db.select('*')
         .from('Veterinar')
@@ -44,7 +44,7 @@ app.get('/veterinari', (req, res) => {
         });
 });
 
-// GET VETERINAR BY ID
+// GET VETERINAR BY ID - Nema ogranicenja
 app.get('/veterinari/:id', (req, res) => {
     const id = req.params.id;
     db.select('*')
@@ -59,7 +59,7 @@ app.get('/veterinari/:id', (req, res) => {
         });
 });
 
-//DELETE VETERINAR BY ID 
+//DELETE VETERINAR BY ID - Samo Admin
 app.delete('/veterinari/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -86,7 +86,7 @@ app.delete('/veterinari/:id', verifyToken, (req, res) => {
     });
 });
 
-//UPDATE VETERINAR
+//UPDATE VETERINAR - Samo Admin
 app.put('/veterinari/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -129,7 +129,7 @@ app.put('/veterinari/:id', verifyToken, (req, res) => {
     });
 });
 
-//CREATE VETERINAR
+//CREATE VETERINAR - Samo Admin
 app.post('/veterinari', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -167,7 +167,7 @@ app.post('/veterinari', verifyToken, (req, res) => {
 //#endregion
 
 //#region TABLE RASA
-// GET ALL RASE
+// GET ALL RASE - Nema ogranicenja
 app.get('/rase', (req, res) => {
     db.select('*')
         .from('Rasa')
@@ -180,7 +180,7 @@ app.get('/rase', (req, res) => {
         });
 });
 
-// GET RASA BY ID
+// GET RASA BY ID - Nema ogranicenja
 app.get('/rase/:id', (req, res) => {
     const id = req.params.id;
     db.select('*')
@@ -195,7 +195,7 @@ app.get('/rase/:id', (req, res) => {
         });
 });
 
-//DELETE RASA BY ID 
+//DELETE RASA BY ID - Samo Admin
 app.delete('/rase/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -222,7 +222,7 @@ app.delete('/rase/:id', verifyToken, (req, res) => {
     });
 });
 
-//UPDATE RASA
+//UPDATE RASA - Samo Admin
 app.put('/rase/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -255,7 +255,7 @@ app.put('/rase/:id', verifyToken, (req, res) => {
     });
 });
 
-//CREATE RASA
+//CREATE RASA - Samo Admin
 app.post('/rase', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -290,7 +290,7 @@ app.post('/rase', verifyToken, (req, res) => {
 //#endregion
 
 //#region TABLE LOKACIJA
-// GET ALL LOKACIJE
+// GET ALL LOKACIJE - Nema ogranicenja
 app.get('/lokacije', (req, res) => {
     db.select('*')
         .from('Lokacija')
@@ -303,7 +303,7 @@ app.get('/lokacije', (req, res) => {
         });
 });
 
-// GET LOKACIJA BY ID
+// GET LOKACIJA BY ID - Nema ogranicenja
 app.get('/lokacije/:id', (req, res) => {
     const id = req.params.id;
     db.select('*')
@@ -318,7 +318,7 @@ app.get('/lokacije/:id', (req, res) => {
         });
 });
 
-//DELETE LOKACIJA BY ID 
+//DELETE LOKACIJA BY ID - Samo Admin
 app.delete('/lokacije/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -346,7 +346,7 @@ app.delete('/lokacije/:id', verifyToken, (req, res) => {
 
 });
 
-//UPDATE LOKACIJA
+//UPDATE LOKACIJA - Samo Admin
 app.put('/lokacije/:id', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -379,7 +379,7 @@ app.put('/lokacije/:id', verifyToken, (req, res) => {
     });
 });
 
-//CREATE LOKACIJA
+//CREATE LOKACIJA - Samo Admin
 app.post('/lokacije', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -553,7 +553,7 @@ app.put('/zivotinje/:id', verifyToken, (req, res) => {
     });
 });
 
-//CREATE ZIVOTINJA - Ulogovani admin ili korisnik
+//CREATE ZIVOTINJA - Ulogovani Admin ili korisnik
 app.post('/zivotinje', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -591,8 +591,8 @@ app.post('/zivotinje', verifyToken, (req, res) => {
 //#endregion
 
 //#region TABLE TERMIN
-// GET ALL TERMIN
-app.get('/termini', (req, res) => {
+// GET ALL TERMIN - Ulogovani Admin ili korisnik
+app.get('/termini', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
             res.sendStatus(403);
@@ -616,27 +616,43 @@ app.get('/termini', (req, res) => {
 
 });
 
-// GET TERMIN BY COMPOSITE ID
-app.get('/termini/:idZivotinje/:idVeterinara/:datum', (req, res) => {
-    const idZivotinje = req.params.idZivotinje;
-    const idVeterinara = req.params.idVeterinara;
-    const datum = req.params.datum;
+// GET TERMIN BY COMPOSITE ID - Admin ili korisnik koji je vlasnik zivotinje
+app.get('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
+    jwt.verify(req.token, 'authToken', (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else {
+            const idZivotinje = req.params.idZivotinje;
+            const idVeterinara = req.params.idVeterinara;
+            const datum = req.params.datum;
+            connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [idZivotinje], function (error, results, fields) {
+                if (error) {
+                    throw error
+                }
+                if (authData.user.role == 'admin' || (results.length > 0 && results[0].vlasnik == authData.user.id)) {
+                    db.select('*')
+                        .from('Termin')
+                        .where('zivotinja', '=', idZivotinje)
+                        .where('pregledao', '=', idVeterinara)
+                        .where('datum', '=', datum)
+                        .then((data) => {
+                            res.json(data);
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            res.status(400).json({ msg: 'Greska.', error: err });
+                        });
 
-    db.select('*')
-        .from('Termin')
-        .where('zivotinja', '=', idZivotinje)
-        .where('pregledao', '=', idVeterinara)
-        .where('datum', '=', datum)
-        .then((data) => {
-            res.json(data);
-        })
-        .catch((err) => {
-            console.log(err);
-            res.status(400).json({ msg: 'Greska.', error: err });
-        });
+                } else {
+                    res.sendStatus(403);
+                    // res.send('Nemate dozvolu za pregled ovog termina.');
+                }
+            });
+        }
+    });
 });
 
-//DELETE TERMIN BY ID 
+//DELETE TERMIN BY COMPOSITE ID - Admin ili korisnik koji je vlasnik zivotinje
 app.delete('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -644,25 +660,35 @@ app.delete('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res)
         } else {
             const idZivotinje = req.params.idZivotinje;
             const idVeterinara = req.params.idVeterinara;
-            const datum = req.params.datum
-            db('Termin')
-                .where('zivotinja', '=', idZivotinje)
-                .where('pregledao', '=', idVeterinara)
-                .where('datum', '=', datum)
-                .del()
-                .then(() => {
-                    console.log('Termin Obrisan');
-                    return res.json({ msg: 'Termin Obrisan' });
-                })
-                .catch((err) => {
-                    console.log(err);
-                    res.status(400).json({ msg: 'Greska u brisanju termina.', error: err });
-                });
+            const datum = req.params.datum;
+            connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [idZivotinje], function (error, results, fields) {
+                if (error) {
+                    throw error
+                }
+                if (authData.user.role == 'admin' || (results.length > 0 && results[0].vlasnik == authData.user.id)) {
+                    db('Termin')
+                        .where('zivotinja', '=', idZivotinje)
+                        .where('pregledao', '=', idVeterinara)
+                        .where('datum', '=', datum)
+                        .del()
+                        .then(() => {
+                            console.log('Termin Obrisan');
+                            return res.json({ msg: 'Termin Obrisan' });
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            res.status(400).json({ msg: 'Greska u brisanju termina.', error: err });
+                        });
+                } else {
+                    res.sendStatus(403);
+                    // res.send('Nemate dozvolu za brisanje ovog termina.');
+                }
+            });
         }
     });
 });
 
-//UPDATE TERMIN
+//UPDATE TERMIN BY COMPOSITE ID - Admin ili korisnik koji je vlasnik zivotinje
 app.put('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -670,35 +696,45 @@ app.put('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) =>
         } else {
             const idZivotinje = req.params.idZivotinje;
             const idVeterinara = req.params.idVeterinara;
-            const datum = req.params.datum
-            const {
-                recept,
-                dijagnoza,
-                napomena
-            } = req.body;
+            const datum = req.params.datum;
+            connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [idZivotinje], function (error, results, fields) {
+                if (error) {
+                    throw error
+                }
+                if (authData.user.role == 'admin' || (results.length > 0 && results[0].vlasnik == authData.user.id)) {
+                    const {
+                        recept,
+                        dijagnoza,
+                        napomena
+                    } = req.body;
 
-            db('Termin')
-                .where('zivotinja', '=', idZivotinje)
-                .where('pregledao', '=', idVeterinara)
-                .where('datum', '=', datum)
-                .update(
-                    {
-                        dijagnoza: dijagnoza,
-                        recept: recept,
-                        napomena: napomena
-                    }
-                ).then(() => {
-                    return res.json({ msg: 'Termin Azuriran' });
-                })
-                .catch((err) => {
-                    console.log(err);
-                    res.status(400).json({ msg: 'Greska u azuriranju termina.', error: err });
-                });
+                    db('Termin')
+                        .where('zivotinja', '=', idZivotinje)
+                        .where('pregledao', '=', idVeterinara)
+                        .where('datum', '=', datum)
+                        .update(
+                            {
+                                dijagnoza: dijagnoza,
+                                recept: recept,
+                                napomena: napomena
+                            }
+                        ).then(() => {
+                            return res.json({ msg: 'Termin Azuriran' });
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            res.status(400).json({ msg: 'Greska u azuriranju termina.', error: err });
+                        });
+                } else {
+                    res.sendStatus(403);
+                    // res.send('Nemate dozvolu za azuriranje ovog termina.');
+                }
+            });
         }
     });
 });
 
-//CREATE TERMIN
+//CREATE TERMIN Ulogovani Admin ili korisnik
 app.post('/termini', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -737,7 +773,7 @@ app.post('/termini', verifyToken, (req, res) => {
 //#endregion
 
 //#region TABLE KORISNIK
-// GET ALL KORISNICI
+// GET ALL KORISNICI - samo Admin
 app.get('/korisnici', verifyToken, (req, res) => {
     jwt.verify(req.token, 'authToken', (err, authData) => {
         if (err) {
@@ -761,7 +797,7 @@ app.get('/korisnici', verifyToken, (req, res) => {
     });
 });
 
-// GET KORISNIK BY ID
+// GET KORISNIK BY ID - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
 app.get('/korisnici/:id', verifyToken, (req, res) => {
     const id = req.params.id;
 
@@ -790,7 +826,7 @@ app.get('/korisnici/:id', verifyToken, (req, res) => {
     });
 });
 
-//DELETE KORISNIK BY ID 
+//DELETE KORISNIK BY ID - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
 app.delete('/korisnici/:id', verifyToken, (req, res) => {
     const id = req.params.id;
 
@@ -818,7 +854,7 @@ app.delete('/korisnici/:id', verifyToken, (req, res) => {
     });
 });
 
-//UPDATE KORISNIK
+//UPDATE KORISNIK - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
 app.put('/korisnici/:id', verifyToken, (req, res) => {
     const id = req.params.id;
 
@@ -856,7 +892,7 @@ app.put('/korisnici/:id', verifyToken, (req, res) => {
     });
 });
 
-//CREATE KORISNIK
+//CREATE KORISNIK - Nema nikakvih ogranicenja
 app.post('/korisnici', (req, res) => {
     const {
         ime,
@@ -920,7 +956,6 @@ app.post('/login', (req, res) => {
         });
     }
 });
-
 //#endregion 
 
 //#region FUNCTIONS
