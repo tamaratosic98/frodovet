@@ -10,14 +10,18 @@ module.exports = function (app, verifyToken, db, connection, filterData) {
                 const query = req.query;
                 const { limit, offset, filter } = query;
 
-                db.select('*')
+                db.limit(limit)
+                    .offset(offset)
+                    .select('*')
                     .from('Korisnik')
                     .then((data) => {
                         if (!!data && data.length > 0) {
                             const filteredData = filterData(filter, data);
-                            return res.status(200).json(filteredData);
+                            if (filteredData.length > 0) {
+                                return res.status(200).json(filteredData);
+                            }
+                            res.sendStatus(204);
                         }
-                        res.sendStatus(204);
                     })
                     .catch((err) => {
                         res.status(404).json({ msg: 'Greska.', error: err });
