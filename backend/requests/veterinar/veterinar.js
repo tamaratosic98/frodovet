@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = function (app, verifyToken, db, connection) {
-    // GET ALL RASE - Nema ogranicenja
-    app.get('/rase', (req, res) => {
+    // GET ALL VETERINARI - Nema ogranicenja
+    app.get('/veterinari', (req, res) => {
         db.select('*')
-            .from('Rasa')
+            .from('Veterinar')
             .then((data) => {
                 res.json(data);
             })
@@ -14,12 +14,12 @@ module.exports = function (app, verifyToken, db, connection) {
             });
     });
 
-    // GET RASA BY ID - Nema ogranicenja
-    app.get('/rase/:id', (req, res) => {
+    // GET VETERINAR BY ID - Nema ogranicenja
+    app.get('/veterinari/:id', (req, res) => {
         const id = req.params.id;
         db.select('*')
-            .from('Rasa')
-            .where('sifra', '=', id)
+            .from('Veterinar')
+            .where('jmbg', '=', id)
             .then((data) => {
                 res.json(data);
             })
@@ -29,23 +29,23 @@ module.exports = function (app, verifyToken, db, connection) {
             });
     });
 
-    //DELETE RASA BY ID - Samo Admin
-    app.delete('/rase/:id', verifyToken, (req, res) => {
+    //DELETE VETERINAR BY ID - Samo Admin
+    app.delete('/veterinari/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
                 res.sendStatus(403);
             } else if (authData.user.role == 'admin') {
                 const id = req.params.id;
-                db('Rasa')
-                    .where('sifra', '=', id)
+                db('Veterinar')
+                    .where('jmbg', '=', id)
                     .del()
                     .then(() => {
-                        console.log('Rasa Obrisana');
-                        return res.json({ msg: 'Rasa Obrisana' });
+                        console.log('Veterinar Obrisan');
+                        return res.json({ msg: 'Veterinar Obrisan' });
                     })
                     .catch((err) => {
                         console.log(err);
-                        res.status(400).json({ msg: 'Greska u brisanju rase.', error: err });
+                        res.status(400).json({ msg: 'Greska u brisanju veterinara.', error: err });
                     });
             } else {
                 res.sendStatus(403);
@@ -56,29 +56,39 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE RASA - Samo Admin
-    app.put('/rase/:id', verifyToken, (req, res) => {
+    //UPDATE VETERINAR - Samo Admin
+    app.put('/veterinari/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
                 res.sendStatus(403);
-            } else if (authData.user.role === 'admin') {
+            } else if (authData.user.role == 'admin') {
                 const id = req.params.id;
                 const {
-                    naziv
+                    ime,
+                    prezime,
+                    datumRodjenja,
+                    adresa,
+                    telefon,
+                    grad
                 } = req.body;
 
-                db('Rasa')
-                    .where('sifra', '=', id)
+                db('Veterinar')
+                    .where('jmbg', '=', id)
                     .update(
                         {
-                            naziv: naziv
+                            prezime: prezime,
+                            ime: ime,
+                            datumRodjenja: datumRodjenja,
+                            adresa: adresa,
+                            telefon: telefon,
+                            grad: grad
                         }
                     ).then(() => {
-                        return res.json({ msg: 'Rasa Azurirana' });
+                        return res.json({ msg: 'Veterinar Azuriran' });
                     })
                     .catch((err) => {
                         console.log(err);
-                        res.status(400).json({ msg: 'Greska u azuriranju rase.', error: err });
+                        res.status(400).json({ msg: 'Greska u azuriranju veterinara.', error: err });
                     });
             } else {
                 res.sendStatus(403);
@@ -89,29 +99,31 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //CREATE RASA - Samo Admin
-    app.post('/rase', verifyToken, (req, res) => {
+    //CREATE VETERINAR - Samo Admin
+    app.post('/veterinari', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
                 res.sendStatus(403);
-            } else if (authData.user.role === 'admin') {
-                const {
-                    sifra,
-                    naziv
-                } = req.body;
+            } else if (authData.user.role == 'admin') {
+                const { jmbg, ime, datumRodjenja, prezime, adresa, telefon, grad } = req.body;
 
-                db('Rasa')
+                db('Veterinar')
                     .insert({
-                        sifra: sifra,
-                        naziv: naziv
+                        jmbg: jmbg,
+                        ime: ime,
+                        adresa: adresa,
+                        datumRodjenja: datumRodjenja,
+                        prezime: prezime,
+                        telefon: telefon,
+                        grad: grad
                     })
                     .then(() => {
-                        return res.json({ msg: 'Rasa Kreirana' });
+                        return res.json({ msg: 'Veterinar Kreiran', authData: authData });
                     })
                     .catch((err) => {
                         console.log(err);
                         console.log('Status code:' + res.statusCode);
-                        res.status(400).json({ msg: 'Greska u kreiranju rase.', error: err });
+                        res.status(400).json({ msg: 'Greska u kreiranju veterinara.', error: err });
                     })
             } else {
                 res.sendStatus(403);
@@ -120,5 +132,7 @@ module.exports = function (app, verifyToken, db, connection) {
                 // });
             }
         });
+
     });
+
 }
