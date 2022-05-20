@@ -14,7 +14,7 @@ const db = knex({
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE,
         port: process.env.PORT
-    },
+    }
 });
 
 const app = express();
@@ -42,7 +42,7 @@ require('./requests/zivotinja/zivotinja')(app, verifyToken, db, connection);
 
 require('./requests/termin/termin')(app, verifyToken, db, connection);
 
-require('./requests/korisnik/korisnik')(app, verifyToken, db, connection);
+require('./requests/korisnik/korisnik')(app, verifyToken, db, connection, filterData);
 
 //#region AUTH
 app.post('/login', (req, res) => {
@@ -87,6 +87,51 @@ function verifyToken(req, res, next) {
     } else {
         res.status(401).json({ msg: 'Molimo vas ulogujte se da biste nastavili.' });
     };
+}
+
+function filterData(filters, data) {
+    if (typeof (filters) == 'string' && !!filters && !!data && filters !== '') {
+        const arr = [];
+        const filter = filters.split('eq');
+        const key = filter[0].trim();
+        const value = filter[1].trim().toLowerCase();
+
+        data.forEach(d => {
+            if (!!d[key] && d[key].toLowerCase() == value) {
+                arr.push(d);
+            }
+        });
+
+        return arr;
+    };
+
+    if (!!filters && !!data) {
+        const arr = [];
+        const mappedFilters = filters.map(f => {
+            const filter = f.split('eq');
+            const key = filter[0].trim();
+            const value = filter[1].trim().toLowerCase();
+            return { key: key, value: value }
+        });
+
+        data.forEach(d => {
+            const allEq = [];
+            mappedFilters.forEach(filter => {
+                if (!!d[filter.key] && d[filter.key].toLowerCase() == filter.value) {
+                    allEq.push(true);
+                } else {
+                    allEq.push(false);
+                }
+            });
+            if (allEq.filter(el => !el).length > 0) {
+                return;
+            };
+            arr.push(d);
+        });
+        return arr;
+    }
+
+    return data;
 }
 
 //#endregion
