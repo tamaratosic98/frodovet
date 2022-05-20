@@ -50,8 +50,11 @@ module.exports = function (app, verifyToken, db, connection) {
                         {
                             naziv: naziv
                         }
-                    ).then(() => {
-                        return res.status(200).json({ msg: 'Sve Rase Azurirane.' });
+                    ).then((data) => {
+                        if (!!data) {
+                            return res.status(200).json({ msg: 'Sve Rase Azurirane.' });
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za azuriranje.' });
                     })
                     .catch((err) => {
                         res.status(409).json({ msg: 'Greska u azuriranju svih rasa.', error: err });
@@ -102,7 +105,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE RASA - Samo Admin
+    //UPDATE RASA BY ID - Samo Admin
     app.put('/rase/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -119,12 +122,14 @@ module.exports = function (app, verifyToken, db, connection) {
                         {
                             naziv: naziv
                         }
-                    ).then(() => {
-                        return res.json({ msg: 'Rasa Azurirana' });
+                    ).then((data) => {
+                        if (!!data) {
+                            return res.status(200).json({ msg: 'Rasa Azurirana' });
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za azuriranje.' });
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska u azuriranju rase.', error: err });
+                        res.status(409).json({ msg: 'Greska u azuriranju rase.', error: err });
                     });
             } else {
                 res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });

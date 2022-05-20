@@ -30,7 +30,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role == 'admin') {
                 const { recept, dijagnoza, napomena } = req.body;
 
@@ -41,16 +41,17 @@ module.exports = function (app, verifyToken, db, connection) {
                             recept: recept,
                             napomena: napomena
                         }
-                    ).then(() => {
-                        return res.json({ msg: 'Svi Termini Azuriran' });
+                    ).then((data) => {
+                        if (!!data) {
+                            return res.json({ msg: 'Svi Termini Azuriran' });
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za azuriranje.' });
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska u azuriranju svih termina.', error: err });
+                        res.status(409).json({ msg: 'Greska u azuriranju svih termina.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                // res.send('Nemate dozvolu za azuriranje ovog termina.');
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });
@@ -191,7 +192,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/termini/:idZivotinje/:idVeterinara/:datum', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else {
                 const idZivotinje = req.params.idZivotinje;
                 const idVeterinara = req.params.idVeterinara;
@@ -201,11 +202,7 @@ module.exports = function (app, verifyToken, db, connection) {
                         throw error
                     }
                     if (authData.user.role == 'admin' || (results.length > 0 && results[0].vlasnik == authData.user.id)) {
-                        const {
-                            recept,
-                            dijagnoza,
-                            napomena
-                        } = req.body;
+                        const { recept, dijagnoza, napomena } = req.body;
 
                         db('Termin')
                             .where('zivotinja', '=', idZivotinje)
@@ -217,16 +214,17 @@ module.exports = function (app, verifyToken, db, connection) {
                                     recept: recept,
                                     napomena: napomena
                                 }
-                            ).then(() => {
-                                return res.json({ msg: 'Termin Azuriran' });
+                            ).then((data) => {
+                                if (!!data) {
+                                    return res.json({ msg: 'Termin Azuriran' });
+                                }
+                                res.status(404).json({ msg: 'Termin sa zadatim id-em ne postoji.' });
                             })
                             .catch((err) => {
-                                console.log(err);
-                                res.status(400).json({ msg: 'Greska u azuriranju termina.', error: err });
+                                res.status(409).json({ msg: 'Greska u azuriranju termina.', error: err });
                             });
                     } else {
-                        res.sendStatus(403);
-                        // res.send('Nemate dozvolu za azuriranje ovog termina.');
+                        res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
                     }
                 });
             }

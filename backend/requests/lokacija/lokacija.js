@@ -49,11 +49,13 @@ module.exports = function (app, verifyToken, db, connection) {
                         {
                             naziv: naziv
                         }
-                    ).then(() => {
-                        return res.status(200).json({ msg: 'Sve Lokacije Azurirane.' });
+                    ).then((data) => {
+                        if (!!data) {
+                            return res.status(200).json({ msg: 'Sve Lokacije Azurirane.' });
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za azuriranje.' });
                     })
                     .catch((err) => {
-                        console.log(err);
                         res.status(409).json({ msg: 'Greska u azuriranju svih lokacija.', error: err });
                     });
             } else {
@@ -106,12 +108,10 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/lokacije/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role === 'admin') {
                 const id = req.params.id;
-                const {
-                    naziv
-                } = req.body;
+                const { naziv } = req.body;
 
                 db('Lokacija')
                     .where('sifra', '=', id)
@@ -119,18 +119,17 @@ module.exports = function (app, verifyToken, db, connection) {
                         {
                             naziv: naziv
                         }
-                    ).then(() => {
-                        return res.json({ msg: 'Lokacija Azurirana' });
+                    ).then((data) => {
+                        if (!!data) {
+                            return res.status(200).json({ msg: 'Lokacija Azurirana' });
+                        }
+                        res.status(404).json({ msg: 'Lokacija sa zadatim id-em ne postoji.' });
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska u azuriranju lokacije.', error: err });
+                        res.status(409).json({ msg: 'Greska u azuriranju lokacije.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                res.json({
-                    message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });

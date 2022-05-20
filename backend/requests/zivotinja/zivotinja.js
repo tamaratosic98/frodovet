@@ -39,8 +39,11 @@ module.exports = function (app, verifyToken, db, connection) {
                             kontaktVlasnika: kontaktVlasnika,
                             rasa: rasa
                         }
-                    ).then(() => {
-                        return res.status(200).json({ msg: 'Sve Zivotinje Azurirane.' });
+                    ).then((data) => {
+                        if (!!data) {
+                            return res.status(200).json({ msg: 'Sve Zivotinje Azurirane.' });
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za azuriranje.' });
                     })
                     .catch((err) => {
                         return res.status(409).json({ msg: 'Greska u azuriranju svih zivotinja.', error: err });
@@ -141,7 +144,7 @@ module.exports = function (app, verifyToken, db, connection) {
     app.put('/zivotinje/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else {
                 const id = req.params.id;
                 connection.query('SELECT * FROM Zivotinja WHERE sifra = ?', [id], function (error, results, fields) {
@@ -150,14 +153,7 @@ module.exports = function (app, verifyToken, db, connection) {
                     }
                     if (authData.user.role == 'admin' || (results.length > 0 && results[0].vlasnik == authData.user.id)) {
                         const id = req.params.id;
-                        const {
-                            ime,
-                            datumRodjenja,
-                            starost,
-                            vlasnik,
-                            kontaktVlasnika,
-                            rasa
-                        } = req.body;
+                        const { ime, datumRodjenja, starost, vlasnik, kontaktVlasnika, rasa } = req.body;
 
                         db('Zivotinja')
                             .where('sifra', '=', id)
@@ -170,16 +166,17 @@ module.exports = function (app, verifyToken, db, connection) {
                                     kontaktVlasnika: kontaktVlasnika,
                                     rasa: rasa
                                 }
-                            ).then(() => {
-                                return res.json({ msg: 'Zivotinja Azurirana' });
+                            ).then((data) => {
+                                if (!!data) {
+                                    return res.status(200).json({ msg: 'Zivotinja Azurirana.' });
+                                }
+                                res.status(404).json({ msg: 'Zivotinja sa zadatim id-em ne postoji.' });
                             })
                             .catch((err) => {
-                                console.log(err);
-                                res.status(400).json({ msg: 'Greska u azuriranju zivotinje.', error: err });
+                                res.status(409).json({ msg: 'Greska u azuriranju zivotinje.', error: err });
                             });
                     } else {
-                        res.sendStatus(403);
-                        // res.send('Nemate dozvolu za pregled ovog ljubimca.');
+                        res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
                     }
                 });
             }

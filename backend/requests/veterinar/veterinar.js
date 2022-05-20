@@ -55,7 +55,10 @@ module.exports = function (app, verifyToken, db, connection) {
                             grad: grad
                         }
                     ).then((data) => {
-                        return res.status(200).json({ msg: 'Svi Veterinari Azurirani' });
+                        if (!!data) {
+                            return res.status(200).json({ msg: 'Svi Veterinari Azurirani' });
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za azuriranje.' });
                     })
                     .catch((err) => {
                         res.status(409).json({ msg: 'Greska u azuriranju svih veterinara.', error: err });
@@ -106,21 +109,14 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE VETERINAR - Samo Admin
+    //UPDATE VETERINAR BY ID - Samo Admin
     app.put('/veterinari/:id', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (authData.user.role == 'admin') {
                 const id = req.params.id;
-                const {
-                    ime,
-                    prezime,
-                    datumRodjenja,
-                    adresa,
-                    telefon,
-                    grad
-                } = req.body;
+                const { ime, prezime, datumRodjenja, adresa, telefon, grad } = req.body;
 
                 db('Veterinar')
                     .where('jmbg', '=', id)
@@ -133,18 +129,17 @@ module.exports = function (app, verifyToken, db, connection) {
                             telefon: telefon,
                             grad: grad
                         }
-                    ).then(() => {
-                        return res.json({ msg: 'Veterinar Azuriran' });
+                    ).then((data) => {
+                        if (!!data) {
+                            return res.status(200).json({ msg: 'Veterinar Azuriran' });
+                        }
+                        res.status(404).json({ msg: 'Veterinar sa zadatim id-em ne postoji.' });
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska u azuriranju veterinara.', error: err });
+                        res.status(409).json({ msg: 'Greska u azuriranju veterinara.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije admina za izvrsavanje ovog zahteva!"
-                // });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });

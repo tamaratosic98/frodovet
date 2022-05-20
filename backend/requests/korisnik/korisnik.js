@@ -100,8 +100,11 @@ module.exports = function (app, verifyToken, db, connection) {
                             email: email,
                             admin: admin
                         }
-                    ).then(() => {
-                        return res.status(200).json({ msg: 'Svi korisnici su azurirani.' });
+                    ).then((data) => {
+                        if (!!data) {
+                            return res.status(200).json({ msg: 'Svi korisnici su azurirani.' });
+                        }
+                        res.status(404).json({ msg: 'Ne postoje rekordi za azuriranje.' });
                     })
                     .catch((err) => {
                         res.status(409).json({ msg: 'Greska u azuriranju svih korisnika.', error: err });
@@ -167,13 +170,13 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE KORISNIK - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
+    //UPDATE KORISNIK BY ID - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
     app.put('/korisnici/:id', verifyToken, (req, res) => {
         const id = req.params.id;
 
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
-                res.sendStatus(403);
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             } else if (id == authData.user.id || authData.user.role === 'admin') {
                 const { ime, prezime, kontakt, username, password, email, admin } = req.body;
 
@@ -189,18 +192,17 @@ module.exports = function (app, verifyToken, db, connection) {
                             email: email,
                             admin: admin
                         }
-                    ).then(() => {
-                        return res.json({ msg: 'Korisnik Azuriran' });
+                    ).then((data) => {
+                        if (!!data) {
+                            return res.status(200).json({ msg: 'Korisnik Azuriran' });
+                        }
+                        res.status(404).json({ msg: 'Korisnik sa zadatim id-em ne postoji.' });
                     })
                     .catch((err) => {
-                        console.log(err);
-                        res.status(400).json({ msg: 'Greska u azuriranju korisnika.', error: err });
+                        res.status(409).json({ msg: 'Greska u azuriranju korisnika.', error: err });
                     });
             } else {
-                res.sendStatus(403);
-                // res.json({
-                //     message: "Nemate privilegije za izvrsavanje ovog zahteva!"
-                // });
+                res.status(403).json({ msg: 'Nemate privilegije za ovaj zahtev.' });
             }
         });
     });
