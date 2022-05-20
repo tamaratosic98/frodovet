@@ -10,7 +10,7 @@ module.exports = function (app, verifyToken, db, connection) {
                 db.select('*')
                     .from('Zivotinja')
                     .then((data) => {
-                        if (!!data) {
+                        if (!!data && data.length > 0) {
                             return res.status(200).json(data);
                         }
                         res.sendStatus(204);

@@ -6,7 +6,7 @@ module.exports = function (app, verifyToken, db, connection) {
         db.select('*')
             .from('Veterinar')
             .then((data) => {
-                if (!!data) {
+                if (!!data && data.length > 0) {
                     return res.status(200).json(data);
                 }
                 res.sendStatus(204);
@@ -78,7 +78,7 @@ module.exports = function (app, verifyToken, db, connection) {
             .from('Veterinar')
             .where('jmbg', '=', id)
             .then((data) => {
-                if (!!data) {
+                if (!!data && data.length > 0) {
                     return res.status(200).json(data);
                 }
                 res.sendStatus(204);

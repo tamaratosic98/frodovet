@@ -10,7 +10,7 @@ module.exports = function (app, verifyToken, db, connection) {
                 db.select('*')
                     .from('Korisnik')
                     .then((data) => {
-                        if (!!data) {
+                        if (!!data && data.length > 0) {
                             return res.status(200).json(data);
                         }
                         res.sendStatus(204);
@@ -24,7 +24,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //CREATE KORISNIK - Nema ogranicenja
+    // CREATE KORISNIK - Nema ogranicenja
     app.post('/korisnici', (req, res) => {
         const {
             ime,
@@ -57,7 +57,7 @@ module.exports = function (app, verifyToken, db, connection) {
             })
     });
 
-    //DELETE ALL KORISNICI - samo Admin 
+    // DELETE ALL KORISNICI - samo Admin 
     app.delete('/korisnici', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -80,7 +80,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE ALL KORISNICI - samo Admin 
+    // UPDATE ALL KORISNICI - samo Admin 
     app.put('/korisnici', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
@@ -126,7 +126,7 @@ module.exports = function (app, verifyToken, db, connection) {
                     .from('Korisnik')
                     .where('sifra', '=', id)
                     .then((data) => {
-                        if (!!data) {
+                        if (!!data && data.length > 0) {
                             return res.status(200).json(data);
                         }
                         res.sendStatus(204);
@@ -140,7 +140,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //DELETE KORISNIK BY ID - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
+    // DELETE KORISNIK BY ID - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
     app.delete('/korisnici/:id', verifyToken, (req, res) => {
         const id = req.params.id;
 
@@ -166,7 +166,7 @@ module.exports = function (app, verifyToken, db, connection) {
         });
     });
 
-    //UPDATE KORISNIK BY ID - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
+    // UPDATE KORISNIK BY ID - Admin i ulogovani korisnik ukoliko je njegov id isti od trazenog
     app.put('/korisnici/:id', verifyToken, (req, res) => {
         const id = req.params.id;
 
