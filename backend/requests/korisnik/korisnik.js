@@ -20,8 +20,8 @@ module.exports = function (app, verifyToken, db, connection, filterData) {
                             if (filteredData.length > 0) {
                                 return res.status(200).json(filteredData);
                             }
-                            res.sendStatus(204);
                         }
+                        res.sendStatus(204);
                     })
                     .catch((err) => {
                         res.status(404).json({ msg: 'Greska.', error: err });

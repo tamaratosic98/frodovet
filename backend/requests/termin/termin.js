@@ -1,17 +1,25 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = function (app, verifyToken, db, connection) {
+module.exports = function (app, verifyToken, db, connection, filterData) {
     // GET ALL TERMINI - Ulogovani Admin ili korisnik
     app.get('/termini', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
                 return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
-                db.select('*')
+                const query = req.query;
+                const { limit, offset, filter } = query;
+
+                db.limit(limit)
+                    .offset(offset)
+                    .select('*')
                     .from('Termin')
                     .then((data) => {
                         if (!!data && data.length > 0) {
-                            return res.status(200).json(data);
+                            const filteredData = filterData(filter, data);
+                            if (filteredData.length > 0) {
+                                return res.status(200).json(filteredData);
+                            }
                         }
                         res.sendStatus(204);
                     })

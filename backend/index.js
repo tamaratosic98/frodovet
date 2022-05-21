@@ -32,15 +32,15 @@ const connection = mysql.createConnection({
 
 //#endregion
 
-require('./requests/veterinar/veterinar')(app, verifyToken, db, connection);
+require('./requests/veterinar/veterinar')(app, verifyToken, db, connection, filterData);
 
-require('./requests/rasa/rasa')(app, verifyToken, db, connection);
+require('./requests/rasa/rasa')(app, verifyToken, db, connection, filterData);
 
-require('./requests/lokacija/lokacija')(app, verifyToken, db, connection);
+require('./requests/lokacija/lokacija')(app, verifyToken, db, connection, filterData);
 
-require('./requests/zivotinja/zivotinja')(app, verifyToken, db, connection);
+require('./requests/zivotinja/zivotinja')(app, verifyToken, db, connection, filterData);
 
-require('./requests/termin/termin')(app, verifyToken, db, connection);
+require('./requests/termin/termin')(app, verifyToken, db, connection, filterData);
 
 require('./requests/korisnik/korisnik')(app, verifyToken, db, connection, filterData);
 

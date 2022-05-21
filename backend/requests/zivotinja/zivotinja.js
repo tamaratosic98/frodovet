@@ -1,17 +1,22 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = function (app, verifyToken, db, connection) {
+module.exports = function (app, verifyToken, db, connection, filterData) {
     // GET ALL ZIVOTINJE - Moze pristupiti samo Admin
     app.get('/zivotinje', verifyToken, (req, res) => {
         jwt.verify(req.token, 'authToken', (err, authData) => {
             if (err) {
                 return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
+                const query = req.query;
+                const { limit, offset, filter } = query;
                 db.select('*')
                     .from('Zivotinja')
                     .then((data) => {
                         if (!!data && data.length > 0) {
-                            return res.status(200).json(data);
+                            const filteredData = filterData(filter, data);
+                            if (filteredData.length > 0) {
+                                return res.status(200).json(filteredData);
+                            }
                         }
                         res.sendStatus(204);
                     })

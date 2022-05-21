@@ -1,13 +1,21 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = function (app, verifyToken, db, connection) {
+module.exports = function (app, verifyToken, db, connection, filterData) {
     // GET ALL LOKACIJE - Nema ogranicenja
     app.get('/lokacije', (req, res) => {
-        db.select('*')
+        const query = req.query;
+        const { limit, offset, filter } = query;
+
+        db.limit(limit)
+            .offset(offset)
+            .select('*')
             .from('Lokacija')
             .then((data) => {
                 if (!!data && data.length > 0) {
-                    return res.status(200).json(data);
+                    const filteredData = filterData(filter, data);
+                    if (filteredData.length > 0) {
+                        return res.status(200).json(filteredData);
+                    }
                 }
                 res.sendStatus(204);
             })
