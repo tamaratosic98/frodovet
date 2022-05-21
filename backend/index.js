@@ -23,6 +23,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 
+app.use(function (req, res, next) {
+    res.setHeader('charset', 'utf-8')
+    res.setHeader('Accept', 'application/json')
+    next();
+});
+
 const connection = mysql.createConnection({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USERNAME,
