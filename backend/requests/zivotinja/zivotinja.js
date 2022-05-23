@@ -100,7 +100,7 @@ module.exports = function (app, verifyToken, db, connection, filterData) {
                             .from('Zivotinja')
                             .where('sifra', '=', id)
                             .then((data) => {
-                                if (!!data) {
+                                if (!!data && data.length > 0) {
                                     return res.status(200).json(data);
                                 }
                                 res.sendStatus(204);
@@ -199,16 +199,16 @@ module.exports = function (app, verifyToken, db, connection, filterData) {
             if (err) {
                 return res.status(404).json({ msg: 'Greska.' });
             } else {
-                const { ime, datumRodjenja, starost, vlasnik, kontaktVlasnika, rasa } = req.body;
+                const { ime, datumRodjenja, starost, kontaktVlasnika, rasa } = req.body;
 
-                if (!ime && !datumRodjenja && !starost && !vlasnik && !kontaktVlasnika && !rasa) {
+                if (!ime && !datumRodjenja && !starost && !kontaktVlasnika && !rasa) {
                     return res.status(400).json({ msg: 'Greska u kreiranju zivotinje.' });
                 };
 
                 db('Zivotinja')
                     .insert({
                         ime: ime,
-                        vlasnik: vlasnik,
+                        vlasnik: authData?.user?.id,
                         starost: starost,
                         datumRodjenja: datumRodjenja,
                         kontaktVlasnika: kontaktVlasnika,

@@ -5,7 +5,9 @@ module.exports = function (app, verifyToken, db, connection, filterData) {
     app.get('/rase', (req, res) => {
         const query = req.query;
         const { limit, offset, filter } = query;
-        db.select('*')
+        db.limit(limit)
+            .offset(offset)
+            .select('*')
             .from('Rasa')
             .then((data) => {
                 if (!!data && data.length > 0) {
@@ -152,15 +154,14 @@ module.exports = function (app, verifyToken, db, connection, filterData) {
             if (err) {
                 return res.status(404).json({ msg: 'Greska.' });
             } else if (authData.user.role === 'admin') {
-                const { sifra, naziv } = req.body;
+                const { naziv } = req.body;
 
-                if (!naziv && !sifra) {
+                if (!naziv) {
                     return res.status(400).json({ msg: 'Greska u kreiranju rase.' });
                 };
 
                 db('Rasa')
                     .insert({
-                        sifra: sifra,
                         naziv: naziv
                     })
                     .then((data) => {

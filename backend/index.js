@@ -75,7 +75,7 @@ app.post('/login', (req, res) => {
                 });
 
             } else {
-                res.send('Pogresno korisnicko ime ili lozinka!');
+                res.status(401).json({ msg: 'Pogresno korisnicko ime ili lozinka!' });
             }
         });
     }
@@ -113,6 +113,7 @@ function filterData(filters, data) {
 
     if (!!filters && !!data) {
         const arr = [];
+
         const mappedFilters = filters.map(f => {
             const filter = f.split('eq');
             const key = filter[0].trim();
